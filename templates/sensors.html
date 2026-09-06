@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+
+
+{% block content %}
+
+<div class="page-header">
+
+    <div>
+
+        <h1>
+            Sensors
+        </h1>
+
+        <p>
+            Live ESP32-S3 hardware status
+        </p>
+
+    </div>
+
+</div>
+
+
+<div class="sensor-status-grid">
+
+
+    <div class="card">
+
+        <h3>
+            ESP32-S3
+        </h3>
+
+        <div
+            id="sensor-esp32"
+            class="sensor-status offline"
+        >
+            Offline
+        </div>
+
+        <p id="device-info">
+            Waiting for device...
+        </p>
+
+    </div>
+
+
+    <div class="card">
+
+        <h3>
+            pH Sensor
+        </h3>
+
+        <div
+            id="sensor-ph"
+            class="sensor-status offline"
+        >
+            Offline
+        </div>
+
+    </div>
+
+
+    <div class="card">
+
+        <h3>
+            TDS Sensor
+        </h3>
+
+        <div
+            id="sensor-tds"
+            class="sensor-status offline"
+        >
+            Offline
+        </div>
+
+    </div>
+
+
+    <div class="card">
+
+        <h3>
+            TCS3448
+        </h3>
+
+        <div
+            id="sensor-tcs3448"
+            class="sensor-status offline"
+        >
+            Offline
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1>Data Collection</h1>
+        <p>Collect measurements from the ESP32-S3</p>
+    </div>
+</div>
+
+<div class="card">
+    <h3>Sample Information</h3>
+
+    <div class="form-grid">
+        <div>
+            <label>Sample ID</label>
+            <div id="sample-id" class="readonly-field">Loading...</div>
+        </div>
+
+        <div>
+            <label>Milk Type</label>
+            <select id="milk-type">
+                <option value="Amul Toned Milk">Amul Toned Milk</option>
+            </select>
+        </div>
+
+        <div>
+            <label>Adulterant</label>
+            <select id="adulterant">
+                <option value="Pure Milk">Pure Milk</option>
+                <option value="Water">Water</option>
+                <option value="Urea">Urea</option>
+                <option value="Starch">Starch</option>
+                <option value="Detergent">Detergent</option>
+            </select>
+        </div>
+
+        <div id="amount-field">
+            <label>Addition Amount</label>
+            <input
+                id="addition-amount"
+                type="number"
+                step="0.01"
+                min="0"
+                placeholder="e.g. 0.25"
+            >
+        </div>
+
+        <div id="unit-field">
+            <label>Unit</label>
+            <select id="addition-unit">
+                <option value="tsp">teaspoon (tsp)</option>
+                <option value="tbsp">tablespoon (tbsp)</option>
+                <option value="mL">millilitres (mL)</option>
+                <option value="g">grams (g)</option>
+                <option value="Other">Other</option>
+            </select>
+        </div>
+    </div>
+
+    <div id="pure-milk-note" class="message normal">
+        Pure milk does not require an addition amount.
+    </div>
+</div>
+
+<div class="card">
+    <h3>Measurement</h3>
+
+    <p class="form-help">
+        Measure the same prepared sample using pH, TDS and TCS3448 sensors.
+    </p>
+
+    <div class="measurement-grid">
+        <div class="sensor-card">
+            <h4>pH</h4>
+            <div id="ph-value" class="sensor-value">--</div>
+            <button id="measure-ph" onclick="measureSensor('ph')">
+                Measure pH
+            </button>
+        </div>
+
+        <div class="sensor-card">
+            <h4>TDS</h4>
+            <div id="tds-value" class="sensor-value">--</div>
+            <button id="measure-tds" onclick="measureSensor('tds')">
+                Measure TDS
+            </button>
+        </div>
+
+        <div class="sensor-card">
+            <h4>TCS3448</h4>
+            <div id="tcs-value" class="sensor-value">--</div>
+            <button id="measure-tcs" onclick="measureSensor('tcs3448')">
+                Measure Spectrum
+            </button>
+        </div>
+    </div>
+
+    <button
+        id="save-sample"
+        class="primary-button"
+        onclick="saveSample()"
+        disabled
+    >
+        Save Sample
+    </button>
+
+    <div id="collection-message" class="message"></div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/collection.js') }}"></script>
+{% endblock %}

@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+
+
+{% block content %}
+
+<div class="page-header">
+
+    <div>
+
+        <h1>
+            Calibration
+        </h1>
+
+        <p>
+            Prepare sensors before collecting the final dataset.
+        </p>
+
+    </div>
+
+</div>
+
+
+<div class="grid-2">
+
+
+    <div class="card">
+
+        <h3>
+            pH Calibration
+        </h3>
+
+        <p>
+            Calibrate the pH sensor using appropriate
+            standard buffer solutions before experimental
+            measurements.
+        </p>
+
+        <div class="notice">
+            Calibration is performed on the ESP32.
+        </div>
+
+    </div>
+
+
+    <div class="card">
+
+        <h3>
+            TDS Calibration
+        </h3>
+
+        <p>
+            Verify the TDS sensor using known reference
+            solutions before measuring milk samples.
+        </p>
+
+        <div class="notice">
+            Record the calibration information.
+        </div>
+
+    </div>
+
+
+    <div class="card">
+
+        <h3>
+            TCS3448
+        </h3>
+
+        <p>
+            Keep illumination, sensor distance,
+            container and measurement geometry consistent.
+        </p>
+
+        <div class="notice">
+            Optical measurements require controlled conditions.
+        </div>
+
+    </div>
+
+
+</div>
+
+{% endblock %}

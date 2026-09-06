@@ -1,0 +1,607 @@
+{% extends "base.html" %}
+
+
+{% block content %}
+
+
+<!-- =========================================
+     START SCREEN
+========================================= -->
+
+<section
+    id="analysis-start"
+    class="analysis-start"
+>
+
+
+    <div class="analysis-icon">
+        ✦
+    </div>
+
+
+    <h1>
+        Analyze Milk
+    </h1>
+
+
+    <p>
+        Place an unknown milk sample in the measurement chamber.
+        The ESP32-S3 will collect readings from the pH, TDS and
+        TCS3448 sensors and prepare an overall milk analysis.
+    </p>
+
+
+    <!-- SENSOR READINESS -->
+
+    <div class="readiness">
+
+
+        <div class="readiness-item">
+
+            <div class="readiness-label">
+                ESP32-S3
+            </div>
+
+            <div
+                id="analysis-esp32"
+                class="readiness-value"
+            >
+                ● Checking
+            </div>
+
+        </div>
+
+
+        <div class="readiness-item">
+
+            <div class="readiness-label">
+                pH SENSOR
+            </div>
+
+            <div
+                id="analysis-ph-status"
+                class="readiness-value"
+            >
+                ● Checking
+            </div>
+
+        </div>
+
+
+        <div class="readiness-item">
+
+            <div class="readiness-label">
+                TDS SENSOR
+            </div>
+
+            <div
+                id="analysis-tds-status"
+                class="readiness-value"
+            >
+                ● Checking
+            </div>
+
+        </div>
+
+
+        <div class="readiness-item">
+
+            <div class="readiness-label">
+                TCS3448
+            </div>
+
+            <div
+                id="analysis-tcs-status"
+                class="readiness-value"
+            >
+                ● Checking
+            </div>
+
+        </div>
+
+
+    </div>
+
+
+    <button
+        id="start-analysis"
+        class="primary-btn analysis-button"
+        onclick="startAnalysis()"
+        disabled
+    >
+
+        ✦ Start Milk Analysis
+
+    </button>
+
+
+    <div
+        id="analysis-start-message"
+        class="page-subtitle"
+    >
+        Waiting for all sensors...
+
+    </div>
+
+</section>
+
+
+
+<!-- =========================================
+     RUNNING
+========================================= -->
+
+<section
+    id="analysis-running"
+    class="analysis-running"
+>
+
+
+    <div class="card progress-card">
+
+
+        <div class="scanner"></div>
+
+
+        <div class="progress-title">
+            Analyzing sample
+        </div>
+
+
+        <div
+            id="analysis-progress-text"
+            class="progress-subtitle"
+        >
+            Preparing sensors...
+        </div>
+
+
+        <div class="measurement-steps">
+
+
+            <div class="measurement-step">
+
+                <div class="step-left">
+
+                    <div class="step-number">
+                        01
+                    </div>
+
+                    <span>
+                        pH measurement
+                    </span>
+
+                </div>
+
+                <div
+                    id="step-ph"
+                    class="step-state"
+                >
+                    Waiting
+                </div>
+
+            </div>
+
+
+            <div class="measurement-step">
+
+                <div class="step-left">
+
+                    <div class="step-number">
+                        02
+                    </div>
+
+                    <span>
+                        TDS measurement
+                    </span>
+
+                </div>
+
+                <div
+                    id="step-tds"
+                    class="step-state"
+                >
+                    Waiting
+                </div>
+
+            </div>
+
+
+            <div class="measurement-step">
+
+                <div class="step-left">
+
+                    <div class="step-number">
+                        03
+                    </div>
+
+                    <span>
+                        TCS3448 optical measurement
+                    </span>
+
+                </div>
+
+                <div
+                    id="step-tcs"
+                    class="step-state"
+                >
+                    Waiting
+                </div>
+
+            </div>
+
+
+        </div>
+
+    </div>
+
+</section>
+
+
+
+<!-- =========================================
+     RESULTS
+========================================= -->
+
+<section
+    id="analysis-results"
+    class="analysis-results"
+>
+
+
+    <div class="page-header">
+
+        <div>
+
+            <h1 class="page-title">
+                Analysis Complete
+            </h1>
+
+            <p class="page-subtitle">
+                Combined interpretation of the measured sample.
+            </p>
+
+        </div>
+
+
+        <button
+            class="secondary-btn"
+            onclick="newAnalysis()"
+        >
+            ↻ Analyze Another Sample
+        </button>
+
+    </div>
+
+
+    <!-- SCORE -->
+
+    <div class="card result-hero">
+
+
+        <div class="score-container">
+
+            <div
+                id="score-ring"
+                class="score-ring"
+            >
+
+                <div
+                    id="score-number"
+                    class="score-number"
+                >
+                    --
+                </div>
+
+            </div>
+
+
+            <div class="score-label">
+                MILK QUALITY SCORE
+            </div>
+
+        </div>
+
+
+        <div>
+
+            <div
+                id="result-title"
+                class="result-title"
+            >
+                Analysis Result
+            </div>
+
+
+            <div
+                id="result-description"
+                class="result-description"
+            >
+                Waiting for analysis...
+            </div>
+
+
+            <div
+                id="result-confidence"
+                class="page-subtitle"
+                style="margin-top:18px;"
+            >
+            </div>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- LOWER GRID -->
+
+    <div class="analysis-grid">
+
+
+        <!-- PREDICTION -->
+
+        <div class="card">
+
+            <div class="card-title">
+                Adulteration Assessment
+            </div>
+
+            <div class="card-description">
+                Model confidence for each investigated adulterant.
+            </div>
+
+
+            <div class="prediction-list">
+
+
+                <div class="prediction-row">
+
+                    <div class="prediction-name">
+                        Pure Milk
+                    </div>
+
+                    <div class="prediction-bar">
+
+                        <div
+                            id="pred-pure"
+                            class="prediction-fill"
+                        ></div>
+
+                    </div>
+
+                    <div
+                        id="pred-pure-value"
+                        class="prediction-percent"
+                    >
+                        --
+                    </div>
+
+                </div>
+
+
+                <div class="prediction-row">
+
+                    <div class="prediction-name">
+                        Water
+                    </div>
+
+                    <div class="prediction-bar">
+
+                        <div
+                            id="pred-water"
+                            class="prediction-fill"
+                        ></div>
+
+                    </div>
+
+                    <div
+                        id="pred-water-value"
+                        class="prediction-percent"
+                    >
+                        --
+                    </div>
+
+                </div>
+
+
+                <div class="prediction-row">
+
+                    <div class="prediction-name">
+                        Urea
+                    </div>
+
+                    <div class="prediction-bar">
+
+                        <div
+                            id="pred-urea"
+                            class="prediction-fill"
+                        ></div>
+
+                    </div>
+
+                    <div
+                        id="pred-urea-value"
+                        class="prediction-percent"
+                    >
+                        --
+                    </div>
+
+                </div>
+
+
+                <div class="prediction-row">
+
+                    <div class="prediction-name">
+                        Starch
+                    </div>
+
+                    <div class="prediction-bar">
+
+                        <div
+                            id="pred-starch"
+                            class="prediction-fill"
+                        ></div>
+
+                    </div>
+
+                    <div
+                        id="pred-starch-value"
+                        class="prediction-percent"
+                    >
+                        --
+                    </div>
+
+                </div>
+
+
+                <div class="prediction-row">
+
+                    <div class="prediction-name">
+                        Detergent
+                    </div>
+
+                    <div class="prediction-bar">
+
+                        <div
+                            id="pred-detergent"
+                            class="prediction-fill"
+                        ></div>
+
+                    </div>
+
+                    <div
+                        id="pred-detergent-value"
+                        class="prediction-percent"
+                    >
+                        --
+                    </div>
+
+                </div>
+
+
+            </div>
+
+        </div>
+
+
+
+        <!-- SENSOR ANALYSIS -->
+
+        <div class="card">
+
+            <div class="card-title">
+                Sensor Measurements
+            </div>
+
+            <div class="card-description">
+                Raw measurements received from ESP32-S3.
+            </div>
+
+
+            <div class="sensor-analysis-grid">
+
+
+                <div class="analysis-sensor">
+
+                    <div class="analysis-sensor-name">
+                        pH
+                    </div>
+
+                    <div
+                        id="result-ph"
+                        class="analysis-sensor-value"
+                    >
+                        --
+                    </div>
+
+                    <div class="analysis-sensor-note">
+                        Measured acidity
+                    </div>
+
+                </div>
+
+
+                <div class="analysis-sensor">
+
+                    <div class="analysis-sensor-name">
+                        TDS
+                    </div>
+
+                    <div
+                        id="result-tds"
+                        class="analysis-sensor-value"
+                    >
+                        --
+                    </div>
+
+                    <div class="analysis-sensor-note">
+                        Conductivity-related
+                    </div>
+
+                </div>
+
+
+                <div class="analysis-sensor">
+
+                    <div class="analysis-sensor-name">
+                        TCS3448
+                    </div>
+
+                    <div
+                        id="result-tcs"
+                        class="analysis-sensor-value"
+                    >
+                        --
+                    </div>
+
+                    <div class="analysis-sensor-note">
+                        Optical response
+                    </div>
+
+                </div>
+
+
+            </div>
+
+        </div>
+
+
+    </div>
+
+
+    <!-- INTERPRETATION -->
+
+    <div
+        class="card"
+        style="margin-top:16px;"
+    >
+
+        <div class="card-title">
+            Overall Interpretation
+        </div>
+
+        <div
+            id="overall-interpretation"
+            class="result-description"
+            style="max-width:none;"
+        >
+            --
+        </div>
+
+    </div>
+
+
+</section>
+
+
+{% endblock %}
+
+
+{% block scripts %}
+
+<script
+    src="{{ url_for('static', filename='js/analyze.js') }}">
+</script>
+
+{% endblock %}

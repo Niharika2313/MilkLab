@@ -1,0 +1,28 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+
+# Virtual environment
+venv/
+.venv/
+env/
+
+# SQLite database
+website/data/*.db
+
+# Generated exports
+website/exports/*
+!website/exports/.gitkeep
+
+# Environment/secrets
+.env
+.env.*
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db

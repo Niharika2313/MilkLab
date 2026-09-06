@@ -1,0 +1,272 @@
+{% extends "base.html" %}
+
+
+{% block content %}
+
+<div class="page-header">
+
+    <div>
+
+        <h1 class="page-title">
+            Laboratory Overview
+        </h1>
+
+        <p class="page-subtitle">
+            Monitor your milk analysis system and experimental data.
+        </p>
+
+    </div>
+
+
+    <a
+        href="/analyze"
+        class="primary-btn"
+    >
+        ✦ Analyze Milk
+    </a>
+
+</div>
+
+
+<!-- HERO -->
+
+<div class="hero">
+
+    <h1>
+        MilkLab
+    </h1>
+
+    <p>
+        Three-sensor milk characterization and adulteration analysis.
+    </p>
+
+    <div class="hero-action">
+
+        <a
+            href="/collection"
+            class="secondary-btn"
+        >
+            + New experiment
+        </a>
+
+    </div>
+
+</div>
+
+
+<!-- STATS -->
+
+<div class="stats">
+
+
+    <div class="card stat-card">
+
+        <div class="stat-label">
+            Total Samples
+        </div>
+
+        <div
+            id="total-samples"
+            class="stat-value"
+        >
+            0
+        </div>
+
+        <div class="stat-meta">
+            Experimental dataset
+        </div>
+
+    </div>
+
+
+    <div class="card stat-card">
+
+        <div class="stat-label">
+            Pure Milk
+        </div>
+
+        <div
+            id="pure-samples"
+            class="stat-value"
+        >
+            0
+        </div>
+
+        <div class="stat-meta">
+            Reference samples
+        </div>
+
+    </div>
+
+
+    <div class="card stat-card">
+
+        <div class="stat-label">
+            Adulterated
+        </div>
+
+        <div
+            id="adulterated-samples"
+            class="stat-value"
+        >
+            0
+        </div>
+
+        <div class="stat-meta">
+            Experimental samples
+        </div>
+
+    </div>
+
+
+    <div class="card stat-card">
+
+        <div class="stat-label">
+            Sensors
+        </div>
+
+        <div
+            id="sensor-count"
+            class="stat-value"
+        >
+            0 / 3
+        </div>
+
+        <div class="stat-meta">
+            Currently online
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- SENSOR CARDS -->
+
+<div class="card">
+
+    <div class="card-title">
+        Sensor Monitor
+    </div>
+
+    <div class="card-description">
+        Live readings from the connected ESP32-S3.
+    </div>
+
+
+    <div class="sensor-grid">
+
+
+        <div class="card sensor-card">
+
+            <div class="sensor-top">
+
+                <div class="sensor-name">
+                    pH SENSOR
+                </div>
+
+                <div
+                    id="dashboard-ph-status"
+                    class="sensor-badge"
+                >
+                    Offline
+                </div>
+
+            </div>
+
+
+            <div
+                id="dashboard-ph-value"
+                class="sensor-reading"
+            >
+                --
+            </div>
+
+
+            <div class="sensor-unit">
+                pH
+            </div>
+
+        </div>
+
+
+        <div class="card sensor-card">
+
+            <div class="sensor-top">
+
+                <div class="sensor-name">
+                    TDS SENSOR
+                </div>
+
+                <div
+                    id="dashboard-tds-status"
+                    class="sensor-badge"
+                >
+                    Offline
+                </div>
+
+            </div>
+
+
+            <div
+                id="dashboard-tds-value"
+                class="sensor-reading"
+            >
+                --
+            </div>
+
+
+            <div class="sensor-unit">
+                ppm / TDS
+            </div>
+
+        </div>
+
+
+        <div class="card sensor-card">
+
+            <div class="sensor-top">
+
+                <div class="sensor-name">
+                    TCS3448
+                </div>
+
+                <div
+                    id="dashboard-tcs-status"
+                    class="sensor-badge"
+                >
+                    Offline
+                </div>
+
+            </div>
+
+
+            <div
+                id="dashboard-tcs-value"
+                class="sensor-reading"
+            >
+                --
+            </div>
+
+
+            <div class="sensor-unit">
+                optical reading
+            </div>
+
+        </div>
+
+
+    </div>
+
+</div>
+
+{% endblock %}
+
+
+{% block scripts %}
+
+<script
+    src="{{ url_for('static', filename='js/dashboard.js') }}">
+</script>
+
+{% endblock %}

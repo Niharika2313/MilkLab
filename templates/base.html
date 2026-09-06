@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MilkLab</title>
+<meta name="description" content="Smart milk adulteration analysis system">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
+
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body>
+<div class="app-shell">
+
+<aside class="sidebar">
+    <div class="brand">
+        <div class="brand-mark">M</div>
+        <div class="brand-text">
+            <div class="brand-name">MilkLab</div>
+            <div class="brand-subtitle">Smart Analysis</div>
+        </div>
+    </div>
+
+    <div class="nav-section">
+        <div class="nav-label">OVERVIEW</div>
+        <a href="/" class="nav-item">
+            <span class="nav-icon">⌂</span>
+            <span>Dashboard</span>
+        </a>
+    </div>
+
+    <div class="nav-section">
+        <div class="nav-label">EXPERIMENT</div>
+        <a href="/collection" class="nav-item">
+            <span class="nav-icon">＋</span>
+            <span>Data Collection</span>
+        </a>
+        <a href="/dataset" class="nav-item">
+            <span class="nav-icon">▤</span>
+            <span>Dataset</span>
+        </a>
+    </div>
+
+    <div class="nav-section">
+        <div class="nav-label">ANALYSIS</div>
+        <a href="/analytics" class="nav-item">
+            <span class="nav-icon">◒</span>
+            <span>Analytics</span>
+        </a>
+    </div>
+
+    <div class="nav-section">
+        <div class="nav-label">HARDWARE</div>
+        <a href="/sensors" class="nav-item">
+            <span class="nav-icon">⌁</span>
+            <span>Sensors</span>
+        </a>
+        <a href="/calibration" class="nav-item">
+            <span class="nav-icon">⊙</span>
+            <span>Calibration</span>
+        </a>
+    </div>
+
+    <div class="nav-section">
+        <div class="nav-label">MILK TESTING</div>
+        <a href="/analyze" class="nav-item analyze-nav">
+            <span class="nav-icon">✦</span>
+            <span>Analyze Milk</span>
+            <span class="new-badge">LIVE</span>
+        </a>
+    </div>
+
+    <div class="sidebar-bottom">
+        <div class="device-mini-card">
+            <div class="mini-status-row">
+                <span class="live-dot"></span>
+                <span>ESP32-S3</span>
+            </div>
+            <div id="sidebar-device-status" class="mini-device-status">
+                Checking...
+            </div>
+        </div>
+    </div>
+</aside>
+
+<main class="main-content">
+    <header class="topbar">
+        <div class="breadcrumb">
+            <span>MilkLab</span>
+            <span class="breadcrumb-separator">/</span>
+            <strong id="current-page">Dashboard</strong>
+        </div>
+
+        <div class="topbar-right">
+            <div id="esp32-top-status" class="device-status offline">
+                <span class="status-light"></span>
+                <span id="esp32-top-text">ESP32 Offline</span>
+            </div>
+
+            <div class="topbar-divider"></div>
+
+            <div class="system-time">
+                <span id="system-time">--:--</span>
+            </div>
+        </div>
+    </header>
+
+    <div class="page-container">
+        {% block content %}
+        {% endblock %}
+    </div>
+</main>
+
+</div>
+
+<script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+<script src="{{ url_for('static', filename='js/websocket.js') }}"></script>
+<script src="{{ url_for('static', filename='js/app.js') }}"></script>
+
+{% block scripts %}
+{% endblock %}
+
+</body>
+</html>

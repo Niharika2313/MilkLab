@@ -1,0 +1,213 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="page-header">
+
+    <div>
+
+        <h1>
+            Dataset
+        </h1>
+
+        <p>
+            Experimental milk measurements collected from the ESP32-S3
+        </p>
+
+    </div>
+
+
+    <button
+        class="primary-button"
+        onclick="exportDataset()"
+    >
+        Export CSV
+    </button>
+
+</div>
+
+
+<!-- DATASET SUMMARY -->
+
+<div class="stats-grid">
+
+    <div class="stat-card">
+
+        <span class="stat-label">
+            Total Samples
+        </span>
+
+        <strong
+            id="total-samples"
+            class="stat-value"
+        >
+            0
+        </strong>
+
+    </div>
+
+
+    <div class="stat-card">
+
+        <span class="stat-label">
+            Pure Milk
+        </span>
+
+        <strong
+            id="pure-samples"
+            class="stat-value"
+        >
+            0
+        </strong>
+
+    </div>
+
+
+    <div class="stat-card">
+
+        <span class="stat-label">
+            Adulterated
+        </span>
+
+        <strong
+            id="adulterated-samples"
+            class="stat-value"
+        >
+            0
+        </strong>
+
+    </div>
+
+</div>
+
+
+<!-- DATASET TABLE -->
+
+<div class="card table-card">
+
+    <div class="table-header">
+
+        <div>
+
+            <h3>
+                Experimental Measurements
+            </h3>
+
+            <p>
+                Sensor readings and sample preparation details
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <div class="table-wrapper">
+
+        <table>
+
+            <thead>
+
+                <tr>
+
+                    <th>
+                        Sample
+                    </th>
+
+                    <th>
+                        Milk
+                    </th>
+
+                    <th>
+                        Adulterant
+                    </th>
+
+                    <th>
+                        Amount
+                    </th>
+
+                    <th>
+                        pH
+                    </th>
+
+                    <th>
+                        TDS
+                    </th>
+
+                    <th>
+                        Clear
+                    </th>
+
+                    <th>
+                        Red
+                    </th>
+
+                    <th>
+                        Green
+                    </th>
+
+                    <th>
+                        Blue
+                    </th>
+
+                    <th>
+                        Time
+                    </th>
+
+                    <th>
+                        Action
+                    </th>
+
+                </tr>
+
+            </thead>
+
+
+            <tbody id="dataset-table">
+
+                <!-- Rows inserted by dataset.js -->
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
+
+
+<!-- EMPTY DATASET MESSAGE -->
+
+<div
+    id="empty-dataset"
+    class="empty-state"
+    style="display: none;"
+>
+
+    <div class="empty-icon">
+        📊
+    </div>
+
+    <h3>
+        No samples yet
+    </h3>
+
+    <p>
+        Start collecting measurements from the Data Collection page.
+    </p>
+
+</div>
+
+{% endblock %}
+
+
+{% block scripts %}
+
+<script
+    src="{{ url_for(
+        'static',
+        filename='js/dataset.js'
+    ) }}">
+</script>
+
+{% endblock %}
