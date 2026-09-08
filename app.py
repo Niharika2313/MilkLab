@@ -1,5 +1,7 @@
 import os
 import json
+import time
+import threading
 
 from flask import Flask, render_template, jsonify, request, send_file
 from flask_socketio import SocketIO, emit
@@ -12,7 +14,6 @@ from config import SECRET_KEY, SOCKETIO_ASYNC_MODE
 
 app = Flask(__name__)
 app.config["SECRET_KEY"] = SECRET_KEY
-
 
 socketio = SocketIO(
     app,
@@ -111,15 +112,50 @@ def esp32_websocket(ws):
     print("==============================")
 
     current_ws = ws
+    stop_sender = threading.Event()
+
+    def send_commands():
+        while not stop_sender.is_set():
+            command = esp32_manager.get_next_command()
+
+            if command is not None:
+                try:
+                    ws.send(command)
+                    print("Server → ESP32:", command)
+                except Exception as error:
+                    print(
+                        "Failed to send command to ESP32:",
+                        error
+                    )
+                    break
+
+            time.sleep(0.05)
+
+    sender_thread = threading.Thread(
+        target=send_commands,
+        daemon=True
+    )
+
+    sender_thread.start()
 
     try:
         while True:
-            message = ws.receive()
+            try:
+                message = ws.receive()
+            except Exception as error:
+                print(
+                    "ESP32 receive error:",
+                    error
+                )
+                break
 
             if message is None:
                 break
 
-            print("ESP32 → Server:", message)
+            print(
+                "ESP32 → Server:",
+                message
+            )
 
             try:
                 data = json.loads(message)
@@ -130,14 +166,24 @@ def esp32_websocket(ws):
             event = data.get("event")
 
             if event == "esp32_connect":
-
                 device_id = data.get("device_id")
                 ip_address = data.get("ip")
                 firmware = data.get("firmware")
 
-                print("Device ID:", device_id)
-                print("IP:", ip_address)
-                print("Firmware:", firmware)
+                print(
+                    "Device ID:",
+                    device_id
+                )
+
+                print(
+                    "IP:",
+                    ip_address
+                )
+
+                print(
+                    "Firmware:",
+                    firmware
+                )
 
                 esp32_manager.device_connected(
                     device_id=device_id,
@@ -159,13 +205,14 @@ def esp32_websocket(ws):
                 }))
 
             elif event == "esp32_heartbeat":
-
                 esp32_manager.heartbeat()
 
             elif event == "esp32_sensor_status":
-
                 sensor = data.get("sensor")
-                online = data.get("online", False)
+                online = data.get(
+                    "online",
+                    False
+                )
 
                 esp32_manager.update_sensor_status(
                     sensor,
@@ -178,7 +225,6 @@ def esp32_websocket(ws):
                 )
 
             elif event == "sensor_result":
-
                 sensor = data.get("sensor")
                 value = data.get("value")
 
@@ -204,8 +250,13 @@ def esp32_websocket(ws):
                     esp32_manager.get_status()
                 )
 
-            elif event == "tcs3448_result":
+            elif event == "ph_progress":
+                socketio.emit(
+                    "ph_progress",
+                    data
+                )
 
+            elif event == "tcs3448_result":
                 esp32_manager.update_reading(
                     "tcs3448",
                     data
@@ -221,11 +272,35 @@ def esp32_websocket(ws):
                     esp32_manager.get_status()
                 )
 
+            elif event == "sensor_error":
+                sensor = data.get("sensor")
+
+                message = data.get(
+                    "message",
+                    "Sensor measurement failed."
+                )
+
+                print(
+                    f"Sensor error [{sensor}]: {message}"
+                )
+
+                socketio.emit(
+                    "sensor_error",
+                    data
+                )
+
     except Exception as error:
-        print("ESP32 WebSocket error:", error)
+        print(
+            "ESP32 WebSocket error:",
+            error
+        )
 
     finally:
-        print("ESP32 WebSocket disconnected.")
+        stop_sender.set()
+
+        print(
+            "ESP32 WebSocket disconnected."
+        )
 
         esp32_manager.device_disconnected(
             websocket=current_ws
@@ -240,7 +315,10 @@ def esp32_websocket(ws):
 @socketio.on("connect")
 def browser_connect():
     print()
-    print("Browser connected:", request.sid)
+    print(
+        "Browser connected:",
+        request.sid
+    )
 
     emit(
         "system_status",
@@ -250,12 +328,18 @@ def browser_connect():
 
 @socketio.on("disconnect")
 def browser_disconnect():
-    print("Browser disconnected:", request.sid)
+    print(
+        "Browser disconnected:",
+        request.sid
+    )
 
 
 @socketio.on("esp32_connect")
 def old_esp32_connect(data):
-    print("Legacy ESP32 Socket.IO event received:", data)
+    print(
+        "Legacy ESP32 Socket.IO event received:",
+        data
+    )
 
 
 @socketio.on("esp32_heartbeat")
@@ -271,7 +355,10 @@ def old_esp32_heartbeat():
 @socketio.on("esp32_sensor_status")
 def old_esp32_sensor_status(data):
     sensor = data.get("sensor")
-    online = data.get("online", False)
+    online = data.get(
+        "online",
+        False
+    )
 
     esp32_manager.update_sensor_status(
         sensor,
@@ -286,7 +373,6 @@ def old_esp32_sensor_status(data):
 
 @socketio.on("sensor_command")
 def sensor_command(data):
-
     sensor = data.get("sensor")
 
     status = esp32_manager.get_status()
@@ -298,6 +384,7 @@ def sensor_command(data):
                 "message": "ESP32 is offline."
             }
         )
+
         return
 
     if sensor not in [
@@ -311,6 +398,22 @@ def sensor_command(data):
                 "message": "Unknown sensor."
             }
         )
+
+        return
+
+    if not status["sensors"].get(
+        sensor,
+        False
+    ):
+        emit(
+            "command_error",
+            {
+                "message":
+                    sensor.upper() +
+                    " sensor is offline."
+            }
+        )
+
         return
 
     message = json.dumps({
@@ -318,24 +421,37 @@ def sensor_command(data):
         "sensor": sensor
     })
 
-    print("Server → ESP32:", message)
+    print(
+        "Queueing command for ESP32:",
+        message
+    )
 
-    success = esp32_manager.send_to_esp32(message)
+    success = esp32_manager.queue_command(
+        message
+    )
 
     if not success:
         emit(
             "command_error",
             {
-                "message": "Unable to communicate with ESP32."
+                "message":
+                    "Unable to communicate with ESP32."
             }
         )
+
+        return
+
+    emit(
+        "command_accepted",
+        {
+            "sensor": sensor
+        }
+    )
 
 
 @socketio.on("save_sample")
 def save_sample(data):
-
     try:
-
         required_fields = [
             "milk_type",
             "adulterant",
@@ -348,21 +464,23 @@ def save_sample(data):
         ]
 
         for field in required_fields:
-
             if field not in data:
                 raise ValueError(
                     f"Missing field: {field}"
                 )
 
         if data["adulterant"] == "Pure Milk":
-
             data["addition_amount"] = None
             data["addition_unit"] = None
 
         else:
+            amount = data.get(
+                "addition_amount"
+            )
 
-            amount = data.get("addition_amount")
-            unit = data.get("addition_unit")
+            unit = data.get(
+                "addition_unit"
+            )
 
             if amount is None:
                 raise ValueError(
@@ -379,7 +497,9 @@ def save_sample(data):
                     "Addition amount must be greater than zero."
                 )
 
-        sample_id = database.save_sample(data)
+        sample_id = database.save_sample(
+            data
+        )
 
         emit(
             "sample_saved",
@@ -392,8 +512,10 @@ def save_sample(data):
         )
 
     except Exception as error:
-
-        print("Database error:", error)
+        print(
+            "Database error:",
+            error
+        )
 
         emit(
             "sample_saved",
@@ -405,14 +527,13 @@ def save_sample(data):
 
 
 def monitor_esp32():
-
     while True:
-
         changed = esp32_manager.check_timeout()
 
         if changed:
-
-            print("ESP32 heartbeat timeout.")
+            print(
+                "ESP32 heartbeat timeout."
+            )
 
             socketio.emit(
                 "system_status",
@@ -423,7 +544,6 @@ def monitor_esp32():
 
 
 if __name__ == "__main__":
-
     socketio.start_background_task(
         monitor_esp32
     )
@@ -433,12 +553,17 @@ if __name__ == "__main__":
     print(" MILK ADULTERATION SYSTEM")
     print("==============================")
     print()
+
     print("Website:")
     print("http://0.0.0.0:5000")
+
     print()
+
     print("ESP32 WebSocket:")
     print("ws://10.90.238.29:5000/esp32")
+
     print()
+
     print("Waiting for ESP32-S3...")
     print()
 

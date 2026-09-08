@@ -107,6 +107,80 @@
 
     <div id="collection-message" class="message"></div>
 </div>
+
+<div id="measurement-modal" class="measurement-modal">
+    <div class="measurement-modal-content">
+
+        <div class="measurement-modal-header">
+            <div>
+                <h2 id="measurement-title">pH Measurement</h2>
+                <p id="measurement-subtitle">Stabilizing electrode...</p>
+            </div>
+
+            <button
+                id="measurement-close"
+                class="modal-close"
+                onclick="closeMeasurementModal()"
+                disabled
+            >
+                &times;
+            </button>
+        </div>
+
+        <div class="measurement-status">
+            <div class="measurement-status-dot"></div>
+            <span id="measurement-status-text">
+                Measurement in progress
+            </span>
+        </div>
+
+        <div class="measurement-main-value">
+            <span id="measurement-current-value">--</span>
+            <small>pH</small>
+        </div>
+
+        <div class="measurement-progress-label">
+            <span>Readings</span>
+            <span id="measurement-reading-count">0 / 8</span>
+        </div>
+
+        <div class="measurement-progress-bar">
+            <div id="measurement-progress-fill"></div>
+        </div>
+
+        <div class="measurement-stats">
+            <div class="measurement-stat">
+                <span>Current Range</span>
+                <strong id="measurement-range">--</strong>
+            </div>
+
+            <div class="measurement-stat">
+                <span>Stable Windows</span>
+                <strong id="measurement-stable-windows">0 / 3</strong>
+            </div>
+        </div>
+
+        <div class="measurement-log-container">
+            <div class="measurement-log-title">
+                Measurement Log
+            </div>
+
+            <div id="measurement-log"></div>
+        </div>
+
+        <div id="measurement-complete" class="measurement-complete">
+            <div class="measurement-complete-value">
+                <span id="measurement-final-value">--</span>
+                <small>pH</small>
+            </div>
+
+            <p>
+                Stable pH reading confirmed successfully.
+            </p>
+        </div>
+
+    </div>
+</div>
 {% endblock %}
 
 {% block scripts %}

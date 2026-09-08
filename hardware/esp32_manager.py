@@ -1,5 +1,6 @@
 import time
 from threading import RLock
+from queue import Queue, Empty
 
 
 class ESP32Manager:
@@ -14,6 +15,7 @@ class ESP32Manager:
         self.firmware_version = None
 
         self.websocket = None
+        self.command_queue = Queue()
 
         self.sensors = {
             "ph": False,
@@ -41,6 +43,12 @@ class ESP32Manager:
             self.ip_address = ip_address
             self.firmware_version = firmware_version
             self.websocket = websocket
+
+            while not self.command_queue.empty():
+                try:
+                    self.command_queue.get_nowait()
+                except Empty:
+                    break
 
     def heartbeat(self):
         with self.lock:
@@ -70,23 +78,19 @@ class ESP32Manager:
 
             self.last_seen = time.time()
 
-    def send_to_esp32(self, message):
+    def queue_command(self, message):
         with self.lock:
             if not self.connected or self.websocket is None:
                 return False
 
-            try:
-                self.websocket.send(message)
-                return True
+            self.command_queue.put(message)
+            return True
 
-            except Exception:
-                self.connected = False
-                self.websocket = None
-
-                for sensor in self.sensors:
-                    self.sensors[sensor] = False
-
-                return False
+    def get_next_command(self):
+        try:
+            return self.command_queue.get_nowait()
+        except Empty:
+            return None
 
     def check_timeout(self):
         with self.lock:

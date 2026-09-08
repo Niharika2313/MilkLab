@@ -18,10 +18,6 @@
     --sidebar: 245px;
 }
 
-/* =========================================
-   RESET
-========================================= */
-
 * {
     box-sizing: border-box;
 }
@@ -52,18 +48,10 @@ a {
     text-decoration: none;
 }
 
-/* =========================================
-   APP
-========================================= */
-
 .app-shell {
     display: flex;
     min-height: 100vh;
 }
-
-/* =========================================
-   SIDEBAR
-========================================= */
 
 .sidebar {
     width: var(--sidebar);
@@ -217,10 +205,6 @@ a {
     font-size: 10px;
 }
 
-/* =========================================
-   MAIN
-========================================= */
-
 .main-content {
     margin-left: var(--sidebar);
     width: calc(100% - var(--sidebar));
@@ -299,10 +283,6 @@ a {
     font-variant-numeric: tabular-nums;
 }
 
-/* =========================================
-   PAGE
-========================================= */
-
 .page-container {
     max-width: 1500px;
     margin: 0 auto;
@@ -330,10 +310,6 @@ a {
     margin-bottom: 27px;
 }
 
-/* =========================================
-   CARDS
-========================================= */
-
 .card {
     background: linear-gradient(
         145deg,
@@ -357,10 +333,6 @@ a {
     font-size: 11px;
     margin-top: 5px;
 }
-
-/* =========================================
-   DASHBOARD
-========================================= */
 
 .hero {
     position: relative;
@@ -460,10 +432,6 @@ a {
     margin-top: 4px;
 }
 
-/* =========================================
-   SENSOR CARDS
-========================================= */
-
 .sensor-grid {
     display: grid;
     grid-template-columns: repeat(3,1fr);
@@ -511,10 +479,6 @@ a {
     margin-left: 4px;
 }
 
-/* =========================================
-   STATUS ROW
-========================================= */
-
 .status-row {
     display: flex;
     align-items: center;
@@ -531,10 +495,6 @@ a {
 .status-dot.online {
     background: var(--green);
 }
-
-/* =========================================
-   ANALYZE PAGE
-========================================= */
 
 .analysis-start {
     max-width: 920px;
@@ -604,8 +564,6 @@ a {
     padding: 14px 24px;
     font-size: 13px;
 }
-
-/* ANALYSIS RUNNING */
 
 .analysis-running {
     display: none;
@@ -687,10 +645,6 @@ a {
     color: var(--green);
 }
 
-/* =========================================
-   RESULTS
-========================================= */
-
 .analysis-results {
     display: none;
 }
@@ -761,10 +715,6 @@ a {
     margin-top: 8px;
 }
 
-/* =========================================
-   PREDICTIONS
-========================================= */
-
 .prediction-list {
     margin-top: 20px;
 }
@@ -807,10 +757,6 @@ a {
     font-weight: 700;
 }
 
-/* =========================================
-   ANALYSIS GRID
-========================================= */
-
 .analysis-grid {
     display: grid;
     grid-template-columns: 1.4fr 1fr;
@@ -847,10 +793,6 @@ a {
     font-size: 9px;
     margin-top: 5px;
 }
-
-/* =========================================
-   FORMS
-========================================= */
 
 .form-grid {
     display: grid;
@@ -894,10 +836,6 @@ a {
     font-weight: 600;
 }
 
-/* =========================================
-   TABLE
-========================================= */
-
 .table-wrapper {
     overflow-x: auto;
 }
@@ -924,10 +862,6 @@ a {
     border-bottom: 1px solid var(--border);
 }
 
-/* =========================================
-   EMPTY STATE
-========================================= */
-
 .empty-state {
     text-align: center;
     padding: 55px 20px;
@@ -938,10 +872,6 @@ a {
     font-size: 28px;
     margin-bottom: 12px;
 }
-
-/* =========================================
-   RESPONSIVE
-========================================= */
 
 @media(max-width:1100px) {
     .stats {
@@ -1005,5 +935,252 @@ a {
     .readiness,
     .sensor-analysis-grid {
         grid-template-columns: 1fr;
+    }
+}
+
+.measurement-modal {
+    position: fixed !important;
+    inset: 0 !important;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(8px);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 99999 !important;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+.measurement-modal.active {
+    display: flex !important;
+}
+
+.measurement-modal-content {
+    width: 100%;
+    max-width: 560px;
+    max-height: 90vh;
+    overflow-y: auto;
+    background: var(--surface);
+    border: 1px solid var(--border-light);
+    border-radius: 18px;
+    padding: 26px;
+    box-shadow: 0 25px 80px rgba(0, 0, 0, 0.5);
+    box-sizing: border-box;
+}
+
+.measurement-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 20px;
+}
+
+.measurement-modal-header h2 {
+    margin: 0;
+    font-family: "Manrope";
+    font-size: 21px;
+    font-weight: 800;
+}
+
+.measurement-modal-header p {
+    margin: 6px 0 0;
+    color: var(--text-muted);
+    font-size: 11px;
+}
+
+.modal-close {
+    border: none;
+    background: transparent;
+    color: var(--text-soft);
+    font-size: 28px;
+    cursor: pointer;
+    line-height: 1;
+}
+
+.modal-close:hover {
+    color: var(--text);
+}
+
+.modal-close:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+}
+
+.measurement-status {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 24px;
+    padding: 12px 14px;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid var(--border);
+    color: var(--text-soft);
+    font-size: 11px;
+}
+
+.measurement-status-dot {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: var(--cyan);
+    animation: measurementPulse 1.2s infinite;
+    flex-shrink: 0;
+}
+
+@keyframes measurementPulse {
+    0%, 100% {
+        opacity: 0.35;
+        transform: scale(0.9);
+    }
+
+    50% {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.measurement-main-value {
+    text-align: center;
+    margin: 30px 0;
+}
+
+.measurement-main-value span {
+    font-family: "Manrope";
+    font-size: 56px;
+    font-weight: 800;
+}
+
+.measurement-main-value small {
+    font-size: 16px;
+    color: var(--text-muted);
+    margin-left: 5px;
+}
+
+.measurement-progress-label {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 8px;
+    color: var(--text-muted);
+    font-size: 10px;
+}
+
+.measurement-progress-bar {
+    height: 8px;
+    border-radius: 20px;
+    background: rgba(255, 255, 255, 0.08);
+    overflow: hidden;
+}
+
+#measurement-progress-fill {
+    width: 0%;
+    height: 100%;
+    border-radius: inherit;
+    background: linear-gradient(
+        90deg,
+        var(--accent),
+        var(--cyan)
+    );
+    transition: width 0.3s ease;
+}
+
+.measurement-stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-top: 18px;
+}
+
+.measurement-stat {
+    padding: 14px;
+    border-radius: 10px;
+    background: rgba(255,255,255,.025);
+    border: 1px solid var(--border);
+}
+
+.measurement-stat span {
+    display: block;
+    color: var(--text-muted);
+    font-size: 10px;
+    margin-bottom: 5px;
+}
+
+.measurement-stat strong {
+    font-size: 13px;
+}
+
+.measurement-log-container {
+    margin-top: 20px;
+}
+
+.measurement-log-title {
+    color: var(--text-soft);
+    font-size: 11px;
+    font-weight: 700;
+    margin-bottom: 8px;
+}
+
+#measurement-log {
+    height: 130px;
+    overflow-y: auto;
+    padding: 12px;
+    border-radius: 10px;
+    background: #0a0f1a;
+    border: 1px solid var(--border);
+    font-family: monospace;
+    font-size: 10px;
+    line-height: 1.7;
+}
+
+.measurement-log-entry {
+    color: var(--text-muted);
+}
+
+.measurement-complete {
+    display: none;
+    text-align: center;
+    margin-top: 24px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border);
+}
+
+.measurement-complete.active {
+    display: block;
+}
+
+.measurement-complete-value {
+    margin-bottom: 8px;
+}
+
+.measurement-complete-value span {
+    font-family: "Manrope";
+    font-size: 42px;
+    font-weight: 800;
+}
+
+.measurement-complete-value small {
+    color: var(--text-muted);
+}
+
+.measurement-complete p {
+    color: var(--text-muted);
+    font-size: 11px;
+    margin-bottom: 18px;
+}
+
+@media (max-width: 600px) {
+    .measurement-modal {
+        padding: 12px;
+    }
+
+    .measurement-modal-content {
+        max-height: 94vh;
+        padding: 20px;
+    }
+
+    .measurement-main-value span {
+        font-size: 46px;
     }
 }
