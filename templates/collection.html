@@ -1,100 +1,448 @@
 {% extends "base.html" %}
 
 {% block content %}
+
 <div class="page-header">
     <div>
-        <h1>Data Collection</h1>
-        <p>Collect measurements from the ESP32-S3</p>
+        <h1>Dataset Collection</h1>
+        <p>Collect pH, TDS and TCS3448 measurements.</p>
     </div>
 </div>
 
-<div class="card">
-    <h3>Sample Information</h3>
 
-    <div class="form-grid">
-        <div>
+<div class="collection-grid">
+
+    <!-- SAMPLE INFORMATION -->
+    <section class="card">
+
+        <div class="card-header">
+            <h2>Sample Information</h2>
+        </div>
+
+
+        <div class="form-group">
             <label>Sample ID</label>
-            <div id="sample-id" class="readonly-field">Loading...</div>
+            <div id="sample-id">--</div>
         </div>
 
-        <div>
-            <label>Milk Type</label>
-            <select id="milk-type">
-                <option value="Amul Toned Milk">Amul Toned Milk</option>
-            </select>
-        </div>
 
-        <div>
-            <label>Adulterant</label>
-            <select id="adulterant">
-                <option value="Pure Milk">Pure Milk</option>
-                <option value="Water">Water</option>
-                <option value="Urea">Urea</option>
-                <option value="Starch">Starch</option>
-                <option value="Detergent">Detergent</option>
-            </select>
-        </div>
+        <div class="form-group">
+            <label for="milk-type">Milk Type</label>
 
-        <div id="amount-field">
-            <label>Addition Amount</label>
             <input
-                id="addition-amount"
-                type="number"
-                step="0.01"
-                min="0"
-                placeholder="e.g. 0.25"
+                type="text"
+                id="milk-type"
+                placeholder="Enter milk type"
+                autocomplete="off"
             >
         </div>
 
-        <div id="unit-field">
-            <label>Unit</label>
-            <select id="addition-unit">
-                <option value="tsp">teaspoon (tsp)</option>
-                <option value="tbsp">tablespoon (tbsp)</option>
-                <option value="mL">millilitres (mL)</option>
-                <option value="g">grams (g)</option>
-                <option value="Other">Other</option>
-            </select>
+
+        <div class="form-group">
+
+            <label for="milk-volume">
+                Milk Volume
+            </label>
+
+            <div class="input-with-unit">
+
+                <input
+                    type="number"
+                    id="milk-volume"
+                    min="0.1"
+                    step="0.1"
+                    value="100"
+                    placeholder="Milk volume"
+                >
+
+                <span>mL</span>
+
+            </div>
+
+            <small>
+                Enter the volume of milk before adding adulterants.
+            </small>
+
         </div>
-    </div>
 
-    <div id="pure-milk-note" class="message normal">
-        Pure milk does not require an addition amount.
-    </div>
-</div>
 
-<div class="card">
-    <h3>Measurement</h3>
+        <!-- ADULTERANTS -->
+        <div class="form-group">
 
-    <p class="form-help">
-        Measure the same prepared sample using pH, TDS and TCS3448 sensors.
-    </p>
+            <label>Adulterants</label>
 
-    <div class="measurement-grid">
-        <div class="sensor-card">
-            <h4>pH</h4>
-            <div id="ph-value" class="sensor-value">--</div>
-            <button id="measure-ph" onclick="measureSensor('ph')">
+            <small>
+                Select all adulterants present in the sample.
+            </small>
+
+        </div>
+
+
+        <div class="adulterant-list">
+
+
+            <!-- WATER -->
+            <div class="adulterant-row">
+
+                <label class="checkbox-label">
+
+                    <input
+                        type="checkbox"
+                        id="water-present"
+                    >
+
+                    <span>Water</span>
+
+                </label>
+
+
+                <div
+                    id="water-fields"
+                    class="adulterant-fields"
+                    style="display:none;"
+                >
+
+                    <input
+                        type="number"
+                        id="water-amount"
+                        min="0"
+                        step="0.1"
+                        placeholder="Amount"
+                    >
+
+                    <span class="fixed-unit">
+                        mL
+                    </span>
+
+                    <input
+                        type="hidden"
+                        id="water-unit"
+                        value="mL"
+                    >
+
+                </div>
+
+            </div>
+
+
+            <!-- UREA -->
+            <div class="adulterant-row">
+
+                <label class="checkbox-label">
+
+                    <input
+                        type="checkbox"
+                        id="urea-present"
+                    >
+
+                    <span>Urea</span>
+
+                </label>
+
+
+                <div
+                    id="urea-fields"
+                    class="adulterant-fields"
+                    style="display:none;"
+                >
+
+                    <input
+                        type="number"
+                        id="urea-amount"
+                        min="0"
+                        step="0.01"
+                        placeholder="Amount"
+                    >
+
+                    <span class="fixed-unit">
+                        tsp
+                    </span>
+
+                    <input
+                        type="hidden"
+                        id="urea-unit"
+                        value="tsp"
+                    >
+
+                </div>
+
+            </div>
+
+
+            <!-- STARCH -->
+            <div class="adulterant-row">
+
+                <label class="checkbox-label">
+
+                    <input
+                        type="checkbox"
+                        id="starch-present"
+                    >
+
+                    <span>Starch</span>
+
+                </label>
+
+
+                <div
+                    id="starch-fields"
+                    class="adulterant-fields"
+                    style="display:none;"
+                >
+
+                    <input
+                        type="number"
+                        id="starch-amount"
+                        min="0"
+                        step="0.01"
+                        placeholder="Amount"
+                    >
+
+                    <span class="fixed-unit">
+                        tsp
+                    </span>
+
+                    <input
+                        type="hidden"
+                        id="starch-unit"
+                        value="tsp"
+                    >
+
+                </div>
+
+            </div>
+
+
+            <!-- DETERGENT -->
+            <div class="adulterant-row">
+
+                <label class="checkbox-label">
+
+                    <input
+                        type="checkbox"
+                        id="detergent-present"
+                    >
+
+                    <span>Detergent</span>
+
+                </label>
+
+
+                <div
+                    id="detergent-fields"
+                    class="adulterant-fields"
+                    style="display:none;"
+                >
+
+                    <input
+                        type="number"
+                        id="detergent-amount"
+                        min="0"
+                        step="0.1"
+                        placeholder="Amount"
+                    >
+
+                    <span class="fixed-unit">
+                        mL
+                    </span>
+
+                    <input
+                        type="hidden"
+                        id="detergent-unit"
+                        value="mL"
+                    >
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div id="pure-milk-note" style="display:none;">
+            Pure milk sample: no adulterant amount is required.
+        </div>
+
+    </section>
+
+
+    <!-- SENSOR MEASUREMENTS -->
+    <section class="card">
+
+        <div class="card-header">
+            <h2>Sensor Measurements</h2>
+        </div>
+
+
+        <!-- pH -->
+        <div class="measurement-card">
+
+            <div>
+
+                <h3>pH Sensor</h3>
+
+                <div id="ph-value">
+                    --
+                </div>
+
+            </div>
+
+
+            <button
+                id="measure-ph"
+                onclick="measureSensor('ph')"
+            >
                 Measure pH
             </button>
+
         </div>
 
-        <div class="sensor-card">
-            <h4>TDS</h4>
-            <div id="tds-value" class="sensor-value">--</div>
-            <button id="measure-tds" onclick="measureSensor('tds')">
+
+        <!-- TDS -->
+        <div class="measurement-card">
+
+            <div>
+
+                <h3>TDS Sensor</h3>
+
+                <div id="tds-value">
+                    --
+                </div>
+
+                <small>
+                    ppm
+                </small>
+
+            </div>
+
+
+            <button
+                id="measure-tds"
+                onclick="measureSensor('tds')"
+            >
                 Measure TDS
             </button>
+
         </div>
 
-        <div class="sensor-card">
-            <h4>TCS3448</h4>
-            <div id="tcs-value" class="sensor-value">--</div>
-            <button id="measure-tcs" onclick="measureSensor('tcs3448')">
+
+        <!-- TCS -->
+        <div class="measurement-card">
+
+            <div>
+
+                <h3>
+                    TCS3448 Spectral Sensor
+                </h3>
+
+                <div id="tcs-value">
+                    --
+                </div>
+
+            </div>
+
+
+            <button
+                id="measure-tcs"
+                onclick="measureSensor('tcs3448')"
+            >
                 Measure Spectrum
             </button>
+
         </div>
+
+    </section>
+
+</div>
+
+
+<!-- TCS3448 VALUES -->
+<section class="card">
+
+    <div class="card-header">
+        <h2>TCS3448 Spectral Values</h2>
     </div>
+
+
+    <div class="spectral-grid">
+
+        <div>
+            <span>F1 (405 nm)</span>
+            <strong id="tcs-f1">--</strong>
+        </div>
+
+        <div>
+            <span>F2 (425 nm)</span>
+            <strong id="tcs-f2">--</strong>
+        </div>
+
+        <div>
+            <span>FZ (450 nm)</span>
+            <strong id="tcs-fz">--</strong>
+        </div>
+
+        <div>
+            <span>F3 (475 nm)</span>
+            <strong id="tcs-f3">--</strong>
+        </div>
+
+        <div>
+            <span>F4 (515 nm)</span>
+            <strong id="tcs-f4">--</strong>
+        </div>
+
+        <div>
+            <span>F5 (550 nm)</span>
+            <strong id="tcs-f5">--</strong>
+        </div>
+
+        <div>
+            <span>FY (555 nm)</span>
+            <strong id="tcs-fy">--</strong>
+        </div>
+
+        <div>
+            <span>FXL (600 nm)</span>
+            <strong id="tcs-fxl">--</strong>
+        </div>
+
+        <div>
+            <span>F6 (640 nm)</span>
+            <strong id="tcs-f6">--</strong>
+        </div>
+
+        <div>
+            <span>F7 (690 nm)</span>
+            <strong id="tcs-f7">--</strong>
+        </div>
+
+        <div>
+            <span>F8 (745 nm)</span>
+            <strong id="tcs-f8">--</strong>
+        </div>
+
+        <div>
+            <span>NIR (855 nm)</span>
+            <strong id="tcs-nir">--</strong>
+        </div>
+
+        <div>
+            <span>Clear</span>
+            <strong id="tcs-clear">--</strong>
+        </div>
+
+        <div>
+            <span>Flicker</span>
+            <strong id="tcs-flicker">--</strong>
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- SAVE -->
+<div class="collection-actions">
 
     <button
         id="save-sample"
@@ -105,17 +453,33 @@
         Save Sample
     </button>
 
-    <div id="collection-message" class="message"></div>
 </div>
 
-<div id="measurement-modal" class="measurement-modal">
+
+<!-- MEASUREMENT POPUP -->
+<div
+    id="measurement-modal"
+    class="measurement-modal"
+>
+
     <div class="measurement-modal-content">
 
+
+        <!-- HEADER -->
         <div class="measurement-modal-header">
+
             <div>
-                <h2 id="measurement-title">pH Measurement</h2>
-                <p id="measurement-subtitle">Stabilizing electrode...</p>
+
+                <h2 id="measurement-title">
+                    Measurement
+                </h2>
+
+                <p id="measurement-subtitle">
+                    Measurement in progress
+                </p>
+
             </div>
+
 
             <button
                 id="measurement-close"
@@ -123,66 +487,138 @@
                 onclick="closeMeasurementModal()"
                 disabled
             >
-                &times;
+                ×
             </button>
+
         </div>
 
+
+        <!-- STATUS -->
         <div class="measurement-status">
-            <div class="measurement-status-dot"></div>
+
+            <span class="measurement-status-dot"></span>
+
             <span id="measurement-status-text">
                 Measurement in progress
             </span>
+
         </div>
 
+
+        <!-- CURRENT VALUE -->
         <div class="measurement-main-value">
-            <span id="measurement-current-value">--</span>
-            <small>pH</small>
+
+            <span id="measurement-current-value">
+                --
+            </span>
+
+            <small id="measurement-current-unit">
+            </small>
+
         </div>
 
+
+        <!-- PROGRESS LABEL -->
         <div class="measurement-progress-label">
-            <span>Readings</span>
-            <span id="measurement-reading-count">0 / 8</span>
+
+            <span>
+                Progress
+            </span>
+
+            <span id="measurement-reading-count">
+                0 / 0
+            </span>
+
         </div>
 
+
+        <!-- PROGRESS -->
         <div class="measurement-progress-bar">
-            <div id="measurement-progress-fill"></div>
+
+            <div
+                id="measurement-progress-fill"
+            ></div>
+
         </div>
 
+
+        <!-- STATS -->
         <div class="measurement-stats">
-            <div class="measurement-stat">
-                <span>Current Range</span>
-                <strong id="measurement-range">--</strong>
-            </div>
+
 
             <div class="measurement-stat">
-                <span>Stable Windows</span>
-                <strong id="measurement-stable-windows">0 / 3</strong>
+
+                <span>
+                    Range
+                </span>
+
+                <strong id="measurement-range">
+                    --
+                </strong>
+
             </div>
+
+
+            <div class="measurement-stat">
+
+                <span id="measurement-stability-label">
+                    Stable Windows
+                </span>
+
+                <strong id="measurement-stable-windows">
+                    --
+                </strong>
+
+            </div>
+
         </div>
 
+
+        <!-- LOG -->
         <div class="measurement-log-container">
+
             <div class="measurement-log-title">
                 Measurement Log
             </div>
 
-            <div id="measurement-log"></div>
-        </div>
-
-        <div id="measurement-complete" class="measurement-complete">
-            <div class="measurement-complete-value">
-                <span id="measurement-final-value">--</span>
-                <small>pH</small>
+            <div id="measurement-log">
             </div>
 
-            <p>
-                Stable pH reading confirmed successfully.
+        </div>
+
+
+        <!-- COMPLETION -->
+        <div
+            id="measurement-complete"
+            class="measurement-complete"
+        >
+
+            <div class="measurement-complete-value">
+
+                <span id="measurement-final-value">
+                    --
+                </span>
+
+                <small id="measurement-final-unit">
+                </small>
+
+            </div>
+
+
+            <p id="measurement-complete-message">
             </p>
+
         </div>
 
     </div>
+
 </div>
+
 {% endblock %}
 
+
 {% block scripts %}
+
 <script src="{{ url_for('static', filename='js/collection.js') }}"></script>
+
 {% endblock %}

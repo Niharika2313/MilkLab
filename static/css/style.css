@@ -1184,3 +1184,160 @@ a {
         font-size: 46px;
     }
 }
+
+.delete-button {
+    padding: 6px 10px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 12px;
+}
+.form-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.form-row > input[type="number"] {
+    flex: 1;
+}
+
+.form-group-unit,
+.fixed-unit {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 48px;
+    height: 40px;
+    padding: 0 12px;
+    border: 1px solid var(--border-light);
+    border-radius: 8px;
+    background: var(--surface-3);
+    color: var(--text-soft);
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.adulterant-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.adulterant-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    padding: 11px 12px;
+    border: 1px solid var(--border);
+    border-radius: 9px;
+    background: var(--surface-2);
+}
+
+.checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    color: var(--text-soft);
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.checkbox-label input {
+    width: 16px;
+    height: 16px;
+}
+
+.adulterant-fields {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.adulterant-fields input[type="number"] {
+    width: 110px;
+}
+
+#pure-milk-note {
+    margin-top: 12px;
+    color: var(--text-muted);
+    font-size: 11px;
+}
+
+.table-wrapper {
+    width: 100%;
+    overflow-x: auto;
+    overflow-y: hidden;
+    border: 1px solid var(--border-light);
+    border-radius: 10px;
+}
+
+.dataset-table {
+    width: 100%;
+    min-width: 1800px;
+    border-collapse: collapse;
+    border-spacing: 0;
+    background: var(--surface);
+}
+
+.dataset-table th,
+.dataset-table td {
+    border: 1px solid var(--border-light);
+    padding: 11px 12px;
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: middle;
+}
+
+.dataset-table th {
+    color: var(--text-soft);
+    background: var(--surface-3);
+    font-size: 9px;
+    text-transform: uppercase;
+    letter-spacing: .8px;
+    font-weight: 700;
+}
+
+.dataset-table td {
+    color: var(--text-soft);
+    background: var(--surface);
+    font-size: 11px;
+}
+
+.dataset-table tbody tr:nth-child(even) td {
+    background: var(--surface-2);
+}
+
+.dataset-table tbody tr:hover td {
+    background: rgba(124,108,255,.06);
+}
+
+.dataset-table th:first-child,
+.dataset-table td:first-child {
+    text-align: left;
+}
+
+.dataset-table th:last-child,
+.dataset-table td:last-child {
+    text-align: center;
+}
+
+.table-wrapper::-webkit-scrollbar {
+    height: 8px;
+}
+
+.table-wrapper::-webkit-scrollbar-track {
+    background: var(--surface-2);
+    border-radius: 4px;
+}
+
+.table-wrapper::-webkit-scrollbar-thumb {
+    background: var(--border-light);
+    border-radius: 4px;
+}
+
+.table-wrapper::-webkit-scrollbar-thumb:hover {
+    background: rgba(255,255,255,.2);
+}

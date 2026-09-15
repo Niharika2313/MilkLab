@@ -256,6 +256,12 @@ def esp32_websocket(ws):
                     data
                 )
 
+            elif event == "tds_progress":
+                socketio.emit(
+                    "tds_progress",
+                    data
+                )
+
             elif event == "tcs3448_result":
                 esp32_manager.update_reading(
                     "tcs3448",
@@ -454,69 +460,86 @@ def save_sample(data):
     try:
         required_fields = [
             "milk_type",
+            "milk_volume_ml",
             "adulterant",
             "ph",
-            "tds",
-            "tcs3448_clear",
-            "tcs3448_red",
-            "tcs3448_green",
-            "tcs3448_blue"
-        ]
+            "tds"
+        ] + database.TCS_FIELDS
 
         for field in required_fields:
             if field not in data:
-                raise ValueError(
-                    f"Missing field: {field}"
-                )
+                raise ValueError(f"Missing field: {field}")
+            if data[field] is None:
+                raise ValueError(f"Invalid value for {field}")
 
-        if data["adulterant"] == "Pure Milk":
-            data["addition_amount"] = None
-            data["addition_unit"] = None
+        data["milk_type"] = str(data["milk_type"]).strip()
+        data["adulterant"] = str(data["adulterant"]).strip()
 
-        else:
-            amount = data.get(
-                "addition_amount"
-            )
+        if not data["milk_type"]:
+            raise ValueError("Milk type is required.")
 
-            unit = data.get(
-                "addition_unit"
-            )
+        milk_volume = float(data["milk_volume_ml"])
+        if milk_volume <= 0:
+            raise ValueError("Milk volume must be greater than zero.")
+        data["milk_volume_ml"] = milk_volume
 
-            if amount is None:
-                raise ValueError(
-                    "Addition amount is required."
-                )
+        adulterant_fields = [
+            ("water", "mL"),
+            ("urea", "tsp"),
+            ("starch", "tsp"),
+            ("detergent", "mL")
+        ]
 
-            if not unit:
-                raise ValueError(
-                    "Addition unit is required."
-                )
+        selected_names = []
 
-            if float(amount) <= 0:
-                raise ValueError(
-                    "Addition amount must be greater than zero."
-                )
+        for key, fixed_unit in adulterant_fields:
+            present = bool(int(data.get(f"{key}_present", 0)))
+            data[f"{key}_present"] = 1 if present else 0
 
-        sample_id = database.save_sample(
-            data
+            if present:
+                amount = data.get(f"{key}_amount")
+                if amount is None:
+                    raise ValueError(f"{key.capitalize()} amount is required.")
+
+                amount = float(amount)
+                if amount <= 0:
+                    raise ValueError(
+                        f"{key.capitalize()} amount must be greater than zero."
+                    )
+
+                data[f"{key}_amount"] = amount
+                data[f"{key}_unit"] = fixed_unit
+                selected_names.append(key.capitalize())
+            else:
+                data[f"{key}_amount"] = None
+                data[f"{key}_unit"] = None
+
+        expected_adulterant = (
+            " + ".join(selected_names)
+            if selected_names
+            else "Pure Milk"
         )
+
+        if data["adulterant"].lower() != expected_adulterant.lower():
+            data["adulterant"] = expected_adulterant
+
+        data["addition_amount"] = None
+        data["addition_unit"] = None
+        data["concentration"] = None
+
+        sample_id = database.save_sample(data)
 
         emit(
             "sample_saved",
             {
                 "success": True,
                 "sample_id": sample_id,
-                "next_sample_id":
-                    database.get_next_sample_id()
+                "next_sample_id": database.get_next_sample_id()
             }
         )
 
     except Exception as error:
-        print(
-            "Database error:",
-            error
-        )
-
+        print("Database error:", error)
         emit(
             "sample_saved",
             {
@@ -524,7 +547,6 @@ def save_sample(data):
                 "error": str(error)
             }
         )
-
 
 def monitor_esp32():
     while True:

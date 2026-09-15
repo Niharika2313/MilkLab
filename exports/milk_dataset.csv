@@ -1,0 +1,2 @@
+sample_id,milk_type,adulterant,addition_amount,addition_unit,concentration,water_present,urea_present,starch_present,detergent_present,water_amount,water_unit,urea_amount,urea_unit,starch_amount,starch_unit,detergent_amount,detergent_unit,ph,tds,tcs3448_f1,tcs3448_f2,tcs3448_fz,tcs3448_f3,tcs3448_f4,tcs3448_f5,tcs3448_fy,tcs3448_fxl,tcs3448_f6,tcs3448_f7,tcs3448_f8,tcs3448_nir,tcs3448_clear,tcs3448_flicker,created_at
+S001,Amul,Urea + Starch,,,,0,1,1,0,,,1.0,tsp,1.0,tsp,,,6.14,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,5.0,2026-09-15T03:57:40

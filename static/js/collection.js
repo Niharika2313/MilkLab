@@ -1,311 +1,958 @@
 let sampleData = {
     ph: null,
     tds: null,
+
+    tcs3448_f1: null,
+    tcs3448_f2: null,
+    tcs3448_fz: null,
+    tcs3448_f3: null,
+    tcs3448_f4: null,
+    tcs3448_f5: null,
+    tcs3448_fy: null,
+    tcs3448_fxl: null,
+    tcs3448_f6: null,
+    tcs3448_f7: null,
+    tcs3448_f8: null,
+    tcs3448_nir: null,
     tcs3448_clear: null,
-    tcs3448_red: null,
-    tcs3448_green: null,
-    tcs3448_blue: null
+    tcs3448_flicker: null
 };
 
 let measurementInProgress = false;
 
-document.addEventListener("DOMContentLoaded", function () {
-    loadNextSampleId();
 
-    const adulterant = document.getElementById("adulterant");
+document.addEventListener(
+    "DOMContentLoaded",
+    function () {
 
-    if (adulterant) {
-        adulterant.addEventListener("change", updateAmountFields);
-        updateAmountFields();
+        loadNextSampleId();
+
+
+        const milkType =
+            document.getElementById(
+                "milk-type"
+            );
+
+
+        const milkVolume =
+            document.getElementById(
+                "milk-volume"
+            );
+
+
+        if (milkType) {
+
+            milkType.addEventListener(
+                "input",
+                checkCanSave
+            );
+
+            milkType.addEventListener(
+                "change",
+                checkCanSave
+            );
+        }
+
+
+        if (milkVolume) {
+
+            milkVolume.addEventListener(
+                "input",
+                checkCanSave
+            );
+
+            milkVolume.addEventListener(
+                "change",
+                checkCanSave
+            );
+        }
+
+
+        getAdulterantDefinitions()
+            .forEach(item => {
+
+                const checkbox =
+                    document.getElementById(
+                        item.checkbox
+                    );
+
+                const amount =
+                    document.getElementById(
+                        item.amount
+                    );
+
+
+                if (checkbox) {
+
+                    checkbox.addEventListener(
+                        "change",
+                        updateAdulterantFields
+                    );
+                }
+
+
+                if (amount) {
+
+                    amount.addEventListener(
+                        "input",
+                        checkCanSave
+                    );
+
+                    amount.addEventListener(
+                        "change",
+                        checkCanSave
+                    );
+                }
+
+            });
+
+
+        updateAdulterantFields();
+        checkCanSave();
+
     }
-});
+);
+
 
 function loadNextSampleId() {
-    fetch("/api/next-sample-id")
+
+    fetch(
+        "/api/next-sample-id"
+    )
+
         .then(response => {
+
             if (!response.ok) {
-                throw new Error("Failed to get sample ID");
+                throw new Error(
+                    "Failed to get sample ID"
+                );
             }
 
             return response.json();
         })
+
         .then(data => {
-            const element = document.getElementById("sample-id");
+
+            const element =
+                document.getElementById(
+                    "sample-id"
+                );
 
             if (element) {
-                element.textContent = data.sample_id;
+                element.textContent =
+                    data.sample_id;
             }
+
         })
+
         .catch(error => {
+
             console.error(error);
 
-            const element = document.getElementById("sample-id");
+            const element =
+                document.getElementById(
+                    "sample-id"
+                );
 
             if (element) {
-                element.textContent = "Error";
+                element.textContent =
+                    "Error";
             }
+
         });
+
 }
 
-function updateAmountFields() {
-    const adulterant =
-        document.getElementById("adulterant").value;
 
-    const amount =
-        document.getElementById("addition-amount");
+function getAdulterantDefinitions() {
 
-    const unit =
-        document.getElementById("addition-unit");
+    return [
+
+        {
+            name: "Water",
+            key: "water",
+
+            checkbox:
+                "water-present",
+
+            amount:
+                "water-amount",
+
+            unit:
+                "water-unit",
+
+            fixedUnit:
+                "mL",
+
+            fields:
+                "water-fields"
+        },
+
+
+        {
+            name: "Urea",
+            key: "urea",
+
+            checkbox:
+                "urea-present",
+
+            amount:
+                "urea-amount",
+
+            unit:
+                "urea-unit",
+
+            fixedUnit:
+                "tsp",
+
+            fields:
+                "urea-fields"
+        },
+
+
+        {
+            name: "Starch",
+            key: "starch",
+
+            checkbox:
+                "starch-present",
+
+            amount:
+                "starch-amount",
+
+            unit:
+                "starch-unit",
+
+            fixedUnit:
+                "tsp",
+
+            fields:
+                "starch-fields"
+        },
+
+
+        {
+            name: "Detergent",
+            key: "detergent",
+
+            checkbox:
+                "detergent-present",
+
+            amount:
+                "detergent-amount",
+
+            unit:
+                "detergent-unit",
+
+            fixedUnit:
+                "mL",
+
+            fields:
+                "detergent-fields"
+        }
+
+    ];
+
+}
+
+
+function updateAdulterantFields() {
+
+    const definitions =
+        getAdulterantDefinitions();
+
+
+    let anySelected =
+        false;
+
+
+    definitions.forEach(
+        item => {
+
+            const checkbox =
+                document.getElementById(
+                    item.checkbox
+                );
+
+
+            const fields =
+                document.getElementById(
+                    item.fields
+                );
+
+
+            const amount =
+                document.getElementById(
+                    item.amount
+                );
+
+
+            const unit =
+                document.getElementById(
+                    item.unit
+                );
+
+
+            const selected =
+                checkbox &&
+                checkbox.checked;
+
+
+            if (selected) {
+                anySelected = true;
+            }
+
+
+            if (fields) {
+
+                fields.style.display =
+                    selected
+                        ? "flex"
+                        : "none";
+            }
+
+
+            if (!selected && amount) {
+                amount.value = "";
+            }
+
+
+            if (unit) {
+                unit.value =
+                    item.fixedUnit;
+            }
+
+        }
+    );
+
 
     const note =
-        document.getElementById("pure-milk-note");
+        document.getElementById(
+            "pure-milk-note"
+        );
 
-    const amountContainer =
-        document.getElementById("amount-field");
 
-    const unitContainer =
-        document.getElementById("unit-field");
+    if (note) {
 
-    const pureMilk =
-        adulterant === "Pure Milk";
+        note.style.display =
+            anySelected
+                ? "none"
+                : "";
 
-    amountContainer.style.display =
-        pureMilk ? "none" : "";
-
-    unitContainer.style.display =
-        pureMilk ? "none" : "";
-
-    note.style.display =
-        pureMilk ? "" : "none";
-
-    if (pureMilk) {
-        amount.value = "";
     }
+
+
+    checkCanSave();
+
 }
 
+
+function getSelectedAdulterants() {
+
+    const definitions =
+        getAdulterantDefinitions();
+
+
+    return definitions.filter(
+        item => {
+
+            const checkbox =
+                document.getElementById(
+                    item.checkbox
+                );
+
+            return (
+                checkbox &&
+                checkbox.checked
+            );
+
+        }
+    );
+
+}
+
+
+function validateAdulterants() {
+
+    const selected =
+        getSelectedAdulterants();
+
+
+    for (
+        const item of selected
+    ) {
+
+        const amountElement =
+            document.getElementById(
+                item.amount
+            );
+
+
+        if (!amountElement) {
+
+            return {
+                valid: false,
+
+                message:
+                    item.name +
+                    " amount field is missing."
+            };
+
+        }
+
+
+        const amount =
+            parseFloat(
+                amountElement.value
+            );
+
+
+        if (
+            isNaN(amount) ||
+            amount <= 0
+        ) {
+
+            return {
+                valid: false,
+
+                message:
+                    "Enter a valid amount for " +
+                    item.name +
+                    "."
+            };
+
+        }
+
+
+        const unitElement =
+            document.getElementById(
+                item.unit
+            );
+
+
+        if (unitElement) {
+
+            unitElement.value =
+                item.fixedUnit;
+        }
+
+    }
+
+
+    return {
+        valid: true
+    };
+
+}
+
+
+function getAdulterantData() {
+
+    const definitions =
+        getAdulterantDefinitions();
+
+
+    const selected =
+        getSelectedAdulterants();
+
+
+    const names =
+        selected.map(
+            item => item.name
+        );
+
+
+    const result = {
+
+        adulterant:
+            names.length > 0
+                ? names.join(" + ")
+                : "Pure Milk",
+
+
+        water_present: 0,
+        urea_present: 0,
+        starch_present: 0,
+        detergent_present: 0,
+
+
+        water_amount: null,
+        water_unit: null,
+
+
+        urea_amount: null,
+        urea_unit: null,
+
+
+        starch_amount: null,
+        starch_unit: null,
+
+
+        detergent_amount: null,
+        detergent_unit: null
+
+    };
+
+
+    definitions.forEach(
+        item => {
+
+            const checkbox =
+                document.getElementById(
+                    item.checkbox
+                );
+
+
+            if (
+                !checkbox ||
+                !checkbox.checked
+            ) {
+                return;
+            }
+
+
+            result[
+                item.key +
+                "_present"
+            ] = 1;
+
+
+            const amountElement =
+                document.getElementById(
+                    item.amount
+                );
+
+
+            result[
+                item.key +
+                "_amount"
+            ] =
+                parseFloat(
+                    amountElement.value
+                );
+
+
+            result[
+                item.key +
+                "_unit"
+            ] =
+                item.fixedUnit;
+
+        }
+    );
+
+
+    return result;
+
+}
+
+
 function measureSensor(sensor) {
+
     if (!esp32Online) {
+
         showMessage(
             "ESP32 is offline. Connect the ESP32-S3 first.",
             "error"
         );
+
         return;
     }
 
+
     if (measurementInProgress) {
+
         showMessage(
             "Another measurement is already running.",
             "error"
         );
+
         return;
     }
+
 
     if (
         window.sensorStates &&
         window.sensorStates[sensor] !== true
     ) {
+
         showMessage(
-            sensor.toUpperCase() + " sensor is offline.",
+            sensor.toUpperCase() +
+            " sensor is offline.",
             "error"
         );
+
         return;
     }
 
-    measurementInProgress = true;
 
-    setMeasurementButtons(true);
+    measurementInProgress =
+        true;
 
-    if (sensor === "ph" || sensor === "tds") {
-        openMeasurementModal(sensor);
+
+    setMeasurementButtons(
+        true
+    );
+
+
+    if (
+        sensor === "ph" ||
+        sensor === "tds"
+    ) {
+
+        openMeasurementModal(
+            sensor
+        );
+
     }
 
+
     showMessage(
-        "Requesting " + sensor + " measurement...",
+        "Requesting " +
+        sensor +
+        " measurement...",
         "normal"
     );
 
-    socket.emit("sensor_command", {
-        sensor: sensor
-    });
+
+    socket.emit(
+        "sensor_command",
+        {
+            sensor: sensor
+        }
+    );
+
 }
 
-function openMeasurementModal(sensor) {
+
+function openMeasurementModal(
+    sensor
+) {
+
     const modal =
-        document.getElementById("measurement-modal");
+        document.getElementById(
+            "measurement-modal"
+        );
+
 
     if (!modal) {
         return;
     }
 
+
     const title =
-        document.getElementById("measurement-title");
+        document.getElementById(
+            "measurement-title"
+        );
+
 
     const subtitle =
-        document.getElementById("measurement-subtitle");
+        document.getElementById(
+            "measurement-subtitle"
+        );
+
 
     const status =
-        document.getElementById("measurement-status-text");
+        document.getElementById(
+            "measurement-status-text"
+        );
+
 
     const currentValue =
-        document.getElementById("measurement-current-value");
+        document.getElementById(
+            "measurement-current-value"
+        );
+
+
+    const currentUnit =
+        document.getElementById(
+            "measurement-current-unit"
+        );
+
+
+    const finalUnit =
+        document.getElementById(
+            "measurement-final-unit"
+        );
+
 
     const readingCount =
-        document.getElementById("measurement-reading-count");
+        document.getElementById(
+            "measurement-reading-count"
+        );
+
 
     const progressFill =
-        document.getElementById("measurement-progress-fill");
+        document.getElementById(
+            "measurement-progress-fill"
+        );
+
 
     const range =
-        document.getElementById("measurement-range");
+        document.getElementById(
+            "measurement-range"
+        );
+
 
     const stableWindows =
-        document.getElementById("measurement-stable-windows");
+        document.getElementById(
+            "measurement-stable-windows"
+        );
 
-    const log =
-        document.getElementById("measurement-log");
-
-    const complete =
-        document.getElementById("measurement-complete");
-
-    const close =
-        document.getElementById("measurement-close");
-
-    const unit =
-        document.getElementById("measurement-unit");
 
     const secondaryLabel =
-        document.getElementById("measurement-secondary-label");
+        document.getElementById(
+            "measurement-stability-label"
+        );
+
+
+    const log =
+        document.getElementById(
+            "measurement-log"
+        );
+
+
+    const complete =
+        document.getElementById(
+            "measurement-complete"
+        );
+
+
+    const close =
+        document.getElementById(
+            "measurement-close"
+        );
+
 
     const completeMessage =
         document.getElementById(
             "measurement-complete-message"
         );
 
-    if (sensor === "ph") {
-        title.textContent =
-            "pH Measurement";
 
-        subtitle.textContent =
-            "Stabilizing electrode...";
+    if (currentValue) {
+        currentValue.textContent =
+            "--";
+    }
 
-        status.textContent =
-            "Measurement in progress";
 
+    if (readingCount) {
         readingCount.textContent =
-            "0 / 8";
+            "0 / 0";
+    }
 
+
+    if (progressFill) {
+        progressFill.style.width =
+            "0%";
+    }
+
+
+    if (range) {
         range.textContent =
             "--";
+    }
 
+
+    if (stableWindows) {
         stableWindows.textContent =
-            "0 / 3";
+            "--";
+    }
 
-        if (unit) {
-            unit.textContent = "pH";
+
+    if (log) {
+        log.innerHTML =
+            "";
+    }
+
+
+    if (complete) {
+        complete.classList.remove(
+            "active"
+        );
+    }
+
+
+    if (close) {
+        close.disabled =
+            true;
+    }
+
+
+    if (sensor === "ph") {
+
+        if (title) {
+            title.textContent =
+                "pH Measurement";
         }
+
+
+        if (subtitle) {
+            subtitle.textContent =
+                "Stabilizing electrode...";
+        }
+
+
+        if (status) {
+            status.textContent =
+                "Measurement in progress";
+        }
+
+
+        if (readingCount) {
+            readingCount.textContent =
+                "0 / 8";
+        }
+
+
+        if (stableWindows) {
+            stableWindows.textContent =
+                "0 / 3";
+        }
+
+
+        if (currentUnit) {
+            currentUnit.textContent =
+                "pH";
+        }
+
+
+        if (finalUnit) {
+            finalUnit.textContent =
+                "pH";
+        }
+
 
         if (secondaryLabel) {
             secondaryLabel.textContent =
                 "Stable Windows";
         }
 
+
         if (completeMessage) {
             completeMessage.textContent =
                 "Stable pH reading confirmed successfully.";
         }
+
     }
 
+
     if (sensor === "tds") {
-        title.textContent =
-            "TDS Measurement";
 
-        subtitle.textContent =
-            "Collecting TDS readings...";
-
-        status.textContent =
-            "Measurement in progress";
-
-        readingCount.textContent =
-            "0 / 30";
-
-        range.textContent =
-            "--";
-
-        stableWindows.textContent =
-            "--";
-
-        if (unit) {
-            unit.textContent = "ppm";
+        if (title) {
+            title.textContent =
+                "TDS Measurement";
         }
+
+
+        if (subtitle) {
+            subtitle.textContent =
+                "Collecting TDS readings...";
+        }
+
+
+        if (status) {
+            status.textContent =
+                "Measurement in progress";
+        }
+
+
+        if (readingCount) {
+            readingCount.textContent =
+                "0 / 30";
+        }
+
+
+        if (stableWindows) {
+            stableWindows.textContent =
+                "--";
+        }
+
+
+        if (currentUnit) {
+            currentUnit.textContent =
+                "ppm";
+        }
+
+
+        if (finalUnit) {
+            finalUnit.textContent =
+                "ppm";
+        }
+
 
         if (secondaryLabel) {
             secondaryLabel.textContent =
                 "Average";
         }
 
+
         if (completeMessage) {
             completeMessage.textContent =
                 "TDS measurement completed successfully.";
         }
+
     }
 
-    currentValue.textContent =
-        "--";
-
-    progressFill.style.width =
-        "0%";
-
-    log.innerHTML =
-        "";
-
-    complete.classList.remove(
-        "active"
-    );
-
-    close.disabled =
-        true;
 
     modal.dataset.sensor =
         sensor;
+
 
     modal.classList.add(
         "active"
     );
 
+
     addMeasurementLog(
         "Measurement started."
     );
 
+
     if (sensor === "ph") {
+
         addMeasurementLog(
             "Checking pH electrode stability..."
         );
+
     }
 
+
     if (sensor === "tds") {
+
         addMeasurementLog(
             "Collecting 30 TDS readings..."
         );
+
     }
+
 }
 
-function addMeasurementLog(message) {
+
+function addMeasurementLog(
+    message
+) {
+
     const log =
         document.getElementById(
             "measurement-log"
         );
 
+
     if (!log) {
         return;
     }
+
 
     const entry =
         document.createElement(
             "div"
         );
 
+
     entry.className =
         "measurement-log-entry";
+
 
     const time =
         new Date().toLocaleTimeString(
@@ -317,339 +964,497 @@ function addMeasurementLog(message) {
             }
         );
 
+
     entry.textContent =
         "[" +
         time +
         "] " +
         message;
 
+
     log.appendChild(
         entry
     );
 
+
     log.scrollTop =
         log.scrollHeight;
+
 }
 
-function updatePHProgress(data) {
+
+function updatePHProgress(
+    data
+) {
+
     const currentValue =
         document.getElementById(
             "measurement-current-value"
         );
+
 
     const readingCount =
         document.getElementById(
             "measurement-reading-count"
         );
 
+
     const progressFill =
         document.getElementById(
             "measurement-progress-fill"
         );
+
 
     const range =
         document.getElementById(
             "measurement-range"
         );
 
+
     const stableWindows =
         document.getElementById(
             "measurement-stable-windows"
         );
+
 
     const subtitle =
         document.getElementById(
             "measurement-subtitle"
         );
 
+
     const unit =
         document.getElementById(
-            "measurement-unit"
+            "measurement-current-unit"
         );
+
 
     const secondaryLabel =
         document.getElementById(
-            "measurement-secondary-label"
+            "measurement-stability-label"
         );
+
 
     if (unit) {
         unit.textContent =
             "pH";
     }
+
 
     if (secondaryLabel) {
         secondaryLabel.textContent =
             "Stable Windows";
     }
 
+
     if (currentValue) {
+
         currentValue.textContent =
             Number(
                 data.current_ph
             ).toFixed(2);
+
     }
 
+
     if (readingCount) {
+
         readingCount.textContent =
             data.readings +
             " / " +
             data.total_readings;
+
     }
 
-    if (progressFill) {
+
+    if (
+        progressFill &&
+        data.total_readings
+    ) {
+
         const percentage =
             (
                 data.readings /
                 data.total_readings
-            ) * 100;
+            ) *
+            100;
+
 
         progressFill.style.width =
             Math.min(
                 percentage,
                 100
-            ) + "%";
+            ) +
+            "%";
+
     }
 
+
     if (range) {
+
         range.textContent =
             Number(
                 data.range
             ).toFixed(3) +
             " pH";
+
     }
 
+
     if (stableWindows) {
+
         stableWindows.textContent =
             data.stable_windows +
             " / " +
             data.required_stable_windows;
+
     }
+
 
     if (subtitle) {
-        if (
+
+        subtitle.textContent =
             data.stable_windows > 0
-        ) {
-            subtitle.textContent =
-                "Confirming stable reading...";
-        } else {
-            subtitle.textContent =
-                "Stabilizing electrode...";
-        }
+                ? "Confirming stable reading..."
+                : "Stabilizing electrode...";
+
     }
 
+
     addMeasurementLog(
+
         "pH " +
         Number(
             data.current_ph
         ).toFixed(2) +
+
         " | Range " +
+
         Number(
             data.range
         ).toFixed(3) +
+
         " | Stable " +
+
         data.stable_windows +
         "/" +
         data.required_stable_windows
+
     );
+
 }
 
-function updateTDSProgress(data) {
+
+function updateTDSProgress(
+    data
+) {
+
     const currentValue =
         document.getElementById(
             "measurement-current-value"
         );
+
 
     const readingCount =
         document.getElementById(
             "measurement-reading-count"
         );
 
+
     const progressFill =
         document.getElementById(
             "measurement-progress-fill"
         );
+
 
     const range =
         document.getElementById(
             "measurement-range"
         );
 
-    const stableWindows =
+
+    const average =
         document.getElementById(
             "measurement-stable-windows"
         );
+
 
     const subtitle =
         document.getElementById(
             "measurement-subtitle"
         );
 
+
     const unit =
         document.getElementById(
-            "measurement-unit"
+            "measurement-current-unit"
         );
+
 
     const secondaryLabel =
         document.getElementById(
-            "measurement-secondary-label"
+            "measurement-stability-label"
         );
+
 
     if (unit) {
         unit.textContent =
             "ppm";
     }
+
 
     if (secondaryLabel) {
         secondaryLabel.textContent =
             "Average";
     }
 
-    if (currentValue) {
+
+    if (
+        data.current_tds !== undefined &&
+        currentValue
+    ) {
+
         currentValue.textContent =
             Number(
                 data.current_tds
             ).toFixed(1);
+
     }
 
-    if (readingCount) {
-        readingCount.textContent =
-            data.readings +
-            " / " +
-            data.total_readings;
+
+    if (
+        data.readings !== undefined &&
+        data.total_readings !== undefined
+    ) {
+
+        if (readingCount) {
+
+            readingCount.textContent =
+                data.readings +
+                " / " +
+                data.total_readings;
+
+        }
+
+
+        if (progressFill) {
+
+            const percentage =
+                (
+                    data.readings /
+                    data.total_readings
+                ) *
+                100;
+
+
+            progressFill.style.width =
+                Math.min(
+                    percentage,
+                    100
+                ) +
+                "%";
+
+        }
+
     }
 
-    if (progressFill) {
-        const percentage =
-            (
-                data.readings /
-                data.total_readings
-            ) * 100;
 
-        progressFill.style.width =
-            Math.min(
-                percentage,
-                100
-            ) + "%";
-    }
+    if (
+        data.range !== undefined &&
+        range
+    ) {
 
-    if (range) {
         range.textContent =
             Number(
                 data.range
             ).toFixed(1) +
             " ppm";
+
     }
 
-    if (stableWindows) {
-        stableWindows.textContent =
+
+    if (
+        data.average !== undefined &&
+        average
+    ) {
+
+        average.textContent =
             Number(
                 data.average
             ).toFixed(1) +
             " ppm";
+
     }
+
 
     if (subtitle) {
-        if (
+
+        subtitle.textContent =
             data.readings <
             data.total_readings
-        ) {
-            subtitle.textContent =
-                "Collecting TDS readings...";
-        } else {
-            subtitle.textContent =
-                "Calculating final TDS...";
-        }
+                ? "Collecting TDS readings..."
+                : "Calculating final TDS...";
+
     }
 
-    addMeasurementLog(
-        "TDS " +
-        Number(
-            data.current_tds
-        ).toFixed(1) +
-        " ppm | Range " +
-        Number(
-            data.range
-        ).toFixed(1) +
-        " ppm | Average " +
-        Number(
-            data.average
-        ).toFixed(1) +
-        " ppm"
-    );
+
+    if (
+        data.current_tds !==
+        undefined
+    ) {
+
+        addMeasurementLog(
+
+            "TDS " +
+
+            Number(
+                data.current_tds
+            ).toFixed(1) +
+
+            " ppm" +
+
+            (
+                data.range !==
+                undefined
+
+                    ? " | Range " +
+
+                      Number(
+                          data.range
+                      ).toFixed(1) +
+
+                      " ppm"
+
+                    : ""
+            ) +
+
+            (
+                data.average !==
+                undefined
+
+                    ? " | Average " +
+
+                      Number(
+                          data.average
+                      ).toFixed(1) +
+
+                      " ppm"
+
+                    : ""
+            )
+
+        );
+
+    }
+
 }
 
-function completeMeasurement(value) {
+
+function completeMeasurement(
+    value
+) {
+
     const subtitle =
         document.getElementById(
             "measurement-subtitle"
         );
+
 
     const status =
         document.getElementById(
             "measurement-status-text"
         );
 
+
     const finalValue =
         document.getElementById(
             "measurement-final-value"
         );
+
+
+    const finalUnit =
+        document.getElementById(
+            "measurement-final-unit"
+        );
+
 
     const complete =
         document.getElementById(
             "measurement-complete"
         );
 
+
     const close =
         document.getElementById(
             "measurement-close"
         );
+
 
     const progressFill =
         document.getElementById(
             "measurement-progress-fill"
         );
 
+
     const unit =
         document.getElementById(
-            "measurement-unit"
+            "measurement-current-unit"
         );
+
 
     const completeMessage =
         document.getElementById(
             "measurement-complete-message"
         );
+
 
     if (unit) {
         unit.textContent =
             "pH";
     }
 
+
+    if (finalUnit) {
+        finalUnit.textContent =
+            "pH";
+    }
+
+
     if (completeMessage) {
+
         completeMessage.textContent =
             "Stable pH reading confirmed successfully.";
+
     }
+
 
     if (subtitle) {
         subtitle.textContent =
             "Measurement complete";
     }
+
 
     if (status) {
         status.textContent =
             "Stable reading confirmed";
     }
 
+
     if (finalValue) {
+
         finalValue.textContent =
             Number(
                 value
             ).toFixed(2);
+
     }
+
 
     if (progressFill) {
         progressFill.style.width =
             "100%";
     }
+
 
     if (complete) {
         complete.classList.add(
@@ -657,91 +1462,148 @@ function completeMeasurement(value) {
         );
     }
 
+
     if (close) {
         close.disabled =
             false;
     }
 
+
     addMeasurementLog(
+
         "Final stabilized pH: " +
+
         Number(
             value
         ).toFixed(2)
+
     );
+
 }
 
-function completeTDSMeasurement(value) {
+
+function completeTDSMeasurement(
+    value
+) {
+
     const subtitle =
         document.getElementById(
             "measurement-subtitle"
         );
+
 
     const status =
         document.getElementById(
             "measurement-status-text"
         );
 
+
     const finalValue =
         document.getElementById(
             "measurement-final-value"
         );
+
+
+    const finalUnit =
+        document.getElementById(
+            "measurement-final-unit"
+        );
+
 
     const complete =
         document.getElementById(
             "measurement-complete"
         );
 
+
     const close =
         document.getElementById(
             "measurement-close"
         );
+
 
     const progressFill =
         document.getElementById(
             "measurement-progress-fill"
         );
 
+
     const unit =
         document.getElementById(
-            "measurement-unit"
+            "measurement-current-unit"
         );
+
 
     const completeMessage =
         document.getElementById(
             "measurement-complete-message"
         );
 
+
+    const tdsValue =
+        document.getElementById(
+            "tds-value"
+        );
+
+
+    const finalTDS =
+        Number(value);
+
+
     if (unit) {
         unit.textContent =
             "ppm";
     }
 
+
+    if (finalUnit) {
+        finalUnit.textContent =
+            "ppm";
+    }
+
+
     if (completeMessage) {
+
         completeMessage.textContent =
             "TDS measurement completed successfully.";
+
     }
+
 
     if (subtitle) {
         subtitle.textContent =
             "Measurement complete";
     }
 
+
     if (status) {
         status.textContent =
             "TDS reading confirmed";
     }
 
+
     if (finalValue) {
+
         finalValue.textContent =
-            Number(
-                value
-            ).toFixed(1);
+            finalTDS.toFixed(1);
+
     }
+
+
+    if (tdsValue) {
+
+        tdsValue.textContent =
+            finalTDS.toFixed(1) +
+            " ppm";
+
+    }
+
 
     if (progressFill) {
         progressFill.style.width =
             "100%";
     }
+
 
     if (complete) {
         complete.classList.add(
@@ -749,132 +1611,297 @@ function completeTDSMeasurement(value) {
         );
     }
 
+
     if (close) {
         close.disabled =
             false;
     }
 
+
     addMeasurementLog(
+
         "Final TDS: " +
-        Number(
-            value
-        ).toFixed(1) +
+        finalTDS.toFixed(1) +
         " ppm"
+
     );
+
 }
 
+
 function closeMeasurementModal() {
+
     const modal =
         document.getElementById(
             "measurement-modal"
         );
 
+
     if (modal) {
+
         modal.classList.remove(
             "active"
         );
+
     }
+
 }
+
 
 socket.on(
     "ph_progress",
     function (data) {
-        updatePHProgress(data);
+
+        updatePHProgress(
+            data
+        );
+
     }
 );
+
 
 socket.on(
     "tds_progress",
     function (data) {
-        updateTDSProgress(data);
+
+        updateTDSProgress(
+            data
+        );
+
     }
 );
+
 
 socket.on(
     "sensor_result",
     function (data) {
 
-        if (data.sensor === "ph") {
-            sampleData.ph =
-                data.value;
+        console.log(
+            "Sensor result:",
+            data
+        );
 
-            document.getElementById(
-                "ph-value"
-            ).textContent =
+
+        if (
+            data.sensor === "ph"
+        ) {
+
+            sampleData.ph =
                 Number(
                     data.value
-                ).toFixed(2);
+                );
+
+
+            const phElement =
+                document.getElementById(
+                    "ph-value"
+                );
+
+
+            if (phElement) {
+
+                phElement.textContent =
+                    Number(
+                        data.value
+                    ).toFixed(2);
+
+            }
+
 
             measurementInProgress =
                 false;
 
+
             setMeasurementButtons(
                 false
             );
+
 
             completeMeasurement(
                 data.value
             );
+
         }
 
-        if (data.sensor === "tds") {
-            sampleData.tds =
-                data.value;
 
-            document.getElementById(
-                "tds-value"
-            ).textContent =
+        if (
+            data.sensor === "tds"
+        ) {
+
+            sampleData.tds =
                 Number(
                     data.value
-                ).toFixed(1);
+                );
+
+
+            const tdsElement =
+                document.getElementById(
+                    "tds-value"
+                );
+
+
+            if (tdsElement) {
+
+                tdsElement.textContent =
+                    Number(
+                        data.value
+                    ).toFixed(1) +
+                    " ppm";
+
+            }
+
 
             measurementInProgress =
                 false;
+
 
             setMeasurementButtons(
                 false
             );
 
+
             completeTDSMeasurement(
                 data.value
             );
+
         }
 
+
         checkCanSave();
+
     }
 );
+
 
 socket.on(
     "tcs3448_result",
     function (data) {
 
+        console.log(
+            "TCS3448 result:",
+            data
+        );
+
+
         measurementInProgress =
             false;
+
 
         setMeasurementButtons(
             false
         );
 
-        sampleData.tcs3448_clear =
-            data.clear;
 
-        sampleData.tcs3448_red =
-            data.red;
+        const channels = [
 
-        sampleData.tcs3448_green =
-            data.green;
+            "f1",
+            "f2",
+            "fz",
+            "f3",
+            "f4",
+            "f5",
+            "fy",
+            "fxl",
+            "f6",
+            "f7",
+            "f8",
+            "nir",
+            "clear",
+            "flicker"
 
-        sampleData.tcs3448_blue =
-            data.blue;
+        ];
 
-        document.getElementById(
-            "tcs-value"
-        ).textContent =
-            "Measured";
+
+        let validResult =
+            true;
+
+
+        channels.forEach(
+            channel => {
+
+                const value =
+                    Number(
+                        data[channel]
+                    );
+
+
+                if (
+                    !Number.isFinite(
+                        value
+                    )
+                ) {
+
+                    validResult =
+                        false;
+
+                    return;
+                }
+
+
+                sampleData[
+                    "tcs3448_" +
+                    channel
+                ] =
+                    value;
+
+
+                const element =
+                    document.getElementById(
+                        "tcs-" +
+                        channel
+                    );
+
+
+                if (element) {
+
+                    element.textContent =
+                        value.toFixed(0);
+
+                }
+
+            }
+        );
+
+
+        if (!validResult) {
+
+            showMessage(
+                "TCS3448 measurement received invalid data.",
+                "error"
+            );
+
+
+            checkCanSave();
+
+            return;
+        }
+
+
+        const tcsValue =
+            document.getElementById(
+                "tcs-value"
+            );
+
+
+        if (tcsValue) {
+
+            tcsValue.textContent =
+                "Measured";
+
+        }
+
+
+        showMessage(
+            "TCS3448 measurement completed successfully.",
+            "success"
+        );
+
 
         checkCanSave();
+
     }
 );
+
 
 socket.on(
     "sensor_error",
@@ -883,55 +1910,79 @@ socket.on(
         measurementInProgress =
             false;
 
+
         setMeasurementButtons(
             false
         );
+
 
         const close =
             document.getElementById(
                 "measurement-close"
             );
 
+
         if (close) {
             close.disabled =
                 false;
         }
 
+
         addMeasurementLog(
+
             "ERROR: " +
+
             (
                 data.message ||
                 "Sensor measurement failed."
             )
+
         );
+
 
         const subtitle =
             document.getElementById(
                 "measurement-subtitle"
             );
 
+
         const status =
             document.getElementById(
                 "measurement-status-text"
             );
 
+
         if (subtitle) {
+
             subtitle.textContent =
                 "Measurement failed";
+
         }
+
 
         if (status) {
+
             status.textContent =
                 "Unable to complete measurement";
+
         }
 
+
         showMessage(
+
             data.message ||
             "Sensor measurement failed.",
+
             "error"
+
         );
+
+
+        checkCanSave();
+
     }
 );
+
 
 socket.on(
     "command_error",
@@ -940,28 +1991,42 @@ socket.on(
         measurementInProgress =
             false;
 
+
         setMeasurementButtons(
             false
         );
+
 
         const modal =
             document.getElementById(
                 "measurement-modal"
             );
 
+
         if (modal) {
+
             modal.classList.remove(
                 "active"
             );
+
         }
 
+
         showMessage(
+
             data.message ||
             "Sensor command failed.",
+
             "error"
+
         );
+
+
+        checkCanSave();
+
     }
 );
+
 
 socket.on(
     "command_accepted",
@@ -971,136 +2036,366 @@ socket.on(
             data.sensor === "ph" ||
             data.sensor === "tds"
         ) {
+
             addMeasurementLog(
                 "Command received by ESP32."
             );
+
         }
+
     }
 );
 
+
 function checkCanSave() {
-    const ready =
+
+    const milkType =
+        document.getElementById(
+            "milk-type"
+        );
+
+
+    const milkVolume =
+        document.getElementById(
+            "milk-volume"
+        );
+
+
+    const milkReady =
+        milkType &&
+        milkType.value.trim() !== "";
+
+
+    const volumeValue =
+        milkVolume
+            ? parseFloat(
+                milkVolume.value
+            )
+            : NaN;
+
+
+    const milkVolumeReady =
+        Number.isFinite(
+            volumeValue
+        ) &&
+        volumeValue > 0;
+
+
+    const adulterantValidation =
+        validateAdulterants();
+
+
+    const tcsChannels = [
+
+        "f1",
+        "f2",
+        "fz",
+        "f3",
+        "f4",
+        "f5",
+        "fy",
+        "fxl",
+        "f6",
+        "f7",
+        "f8",
+        "nir",
+        "clear",
+        "flicker"
+
+    ];
+
+
+    const pHReady =
         sampleData.ph !== null &&
+        Number.isFinite(
+            sampleData.ph
+        );
+
+
+    const tdsReady =
         sampleData.tds !== null &&
-        sampleData.tcs3448_clear !== null &&
-        sampleData.tcs3448_red !== null &&
-        sampleData.tcs3448_green !== null &&
-        sampleData.tcs3448_blue !== null;
+        Number.isFinite(
+            sampleData.tds
+        );
+
+
+    const tcsReady =
+        tcsChannels.every(
+            channel => {
+
+                const value =
+                    sampleData[
+                        "tcs3448_" +
+                        channel
+                    ];
+
+
+                return (
+                    value !== null &&
+                    Number.isFinite(
+                        value
+                    )
+                );
+
+            }
+        );
+
+
+    const ready =
+        milkReady &&
+        milkVolumeReady &&
+        adulterantValidation.valid &&
+        pHReady &&
+        tdsReady &&
+        tcsReady;
+
 
     const button =
         document.getElementById(
             "save-sample"
         );
 
-    button.disabled =
-        !ready;
+
+    if (button) {
+
+        button.disabled =
+            !ready;
+
+    }
+
 
     if (ready) {
+
         showMessage(
-            "All sensor measurements received. Sample can be saved.",
+
+            "All sample information and sensor measurements are ready. Sample can be saved.",
+
             "success"
+
         );
+
     }
+
 }
 
+
 function saveSample() {
-    const milkType =
+
+    const milkTypeElement =
         document.getElementById(
             "milk-type"
-        ).value;
-
-    const adulterant =
-        document.getElementById(
-            "adulterant"
-        ).value;
-
-    const amountInput =
-        document.getElementById(
-            "addition-amount"
         );
 
-    const unitInput =
-        document.getElementById(
-            "addition-unit"
+
+    const milkType =
+        milkTypeElement
+            ? milkTypeElement.value.trim()
+            : "";
+
+
+    if (!milkType) {
+
+        showMessage(
+            "Enter the milk type.",
+            "error"
         );
 
-    const additionAmount =
-        parseFloat(
-            amountInput.value
-        );
-
-    const additionUnit =
-        unitInput.value;
-
-    if (
-        adulterant !== "Pure Milk"
-    ) {
-        if (
-            isNaN(additionAmount) ||
-            additionAmount <= 0
-        ) {
-            showMessage(
-                "Enter a valid addition amount.",
-                "error"
-            );
-
-            return;
-        }
-
-        if (!additionUnit) {
-            showMessage(
-                "Select the addition unit.",
-                "error"
-            );
-
-            return;
-        }
+        return;
     }
 
+
+    const milkVolumeElement =
+        document.getElementById(
+            "milk-volume"
+        );
+
+
+    const milkVolume =
+        milkVolumeElement
+            ? parseFloat(
+                milkVolumeElement.value
+            )
+            : NaN;
+
+
+    if (
+        !Number.isFinite(
+            milkVolume
+        ) ||
+        milkVolume <= 0
+    ) {
+
+        showMessage(
+            "Enter a valid milk volume.",
+            "error"
+        );
+
+        return;
+    }
+
+
+    const adulterantValidation =
+        validateAdulterants();
+
+
+    if (
+        !adulterantValidation.valid
+    ) {
+
+        showMessage(
+            adulterantValidation.message,
+            "error"
+        );
+
+        return;
+    }
+
+
+    const adulterantData =
+        getAdulterantData();
+
+
     const data = {
+
         milk_type:
             milkType,
 
+
+        milk_volume_ml:
+            milkVolume,
+
+
         adulterant:
-            adulterant,
+            adulterantData.adulterant,
 
-        addition_amount:
-            adulterant === "Pure Milk"
-                ? null
-                : additionAmount,
 
-        addition_unit:
-            adulterant === "Pure Milk"
-                ? null
-                : additionUnit,
+        water_present:
+            adulterantData.water_present,
 
-        concentration:
-            null,
+
+        urea_present:
+            adulterantData.urea_present,
+
+
+        starch_present:
+            adulterantData.starch_present,
+
+
+        detergent_present:
+            adulterantData.detergent_present,
+
+
+        water_amount:
+            adulterantData.water_amount,
+
+
+        water_unit:
+            adulterantData.water_unit,
+
+
+        urea_amount:
+            adulterantData.urea_amount,
+
+
+        urea_unit:
+            adulterantData.urea_unit,
+
+
+        starch_amount:
+            adulterantData.starch_amount,
+
+
+        starch_unit:
+            adulterantData.starch_unit,
+
+
+        detergent_amount:
+            adulterantData.detergent_amount,
+
+
+        detergent_unit:
+            adulterantData.detergent_unit,
+
 
         ph:
             sampleData.ph,
 
+
         tds:
             sampleData.tds,
+
+
+        tcs3448_f1:
+            sampleData.tcs3448_f1,
+
+
+        tcs3448_f2:
+            sampleData.tcs3448_f2,
+
+
+        tcs3448_fz:
+            sampleData.tcs3448_fz,
+
+
+        tcs3448_f3:
+            sampleData.tcs3448_f3,
+
+
+        tcs3448_f4:
+            sampleData.tcs3448_f4,
+
+
+        tcs3448_f5:
+            sampleData.tcs3448_f5,
+
+
+        tcs3448_fy:
+            sampleData.tcs3448_fy,
+
+
+        tcs3448_fxl:
+            sampleData.tcs3448_fxl,
+
+
+        tcs3448_f6:
+            sampleData.tcs3448_f6,
+
+
+        tcs3448_f7:
+            sampleData.tcs3448_f7,
+
+
+        tcs3448_f8:
+            sampleData.tcs3448_f8,
+
+
+        tcs3448_nir:
+            sampleData.tcs3448_nir,
+
 
         tcs3448_clear:
             sampleData.tcs3448_clear,
 
-        tcs3448_red:
-            sampleData.tcs3448_red,
 
-        tcs3448_green:
-            sampleData.tcs3448_green,
+        tcs3448_flicker:
+            sampleData.tcs3448_flicker
 
-        tcs3448_blue:
-            sampleData.tcs3448_blue
     };
+
+
+    console.log(
+        "Saving sample:",
+        data
+    );
+
 
     socket.emit(
         "save_sample",
         data
     );
+
 }
+
 
 socket.on(
     "sample_saved",
@@ -1109,81 +2404,347 @@ socket.on(
         if (data.success) {
 
             showMessage(
+
                 "Sample " +
                 data.sample_id +
                 " saved successfully.",
+
                 "success"
+
             );
+
 
             resetMeasurement();
 
+
             if (data.next_sample_id) {
 
-                document.getElementById(
-                    "sample-id"
-                ).textContent =
-                    data.next_sample_id;
+                const sampleId =
+                    document.getElementById(
+                        "sample-id"
+                    );
+
+
+                if (sampleId) {
+
+                    sampleId.textContent =
+                        data.next_sample_id;
+
+                }
 
             } else {
 
                 loadNextSampleId();
+
             }
 
         } else {
 
             showMessage(
+
                 data.error ||
                 "Failed to save sample.",
+
                 "error"
+
             );
+
         }
+
     }
 );
+
 
 function resetMeasurement() {
 
     sampleData = {
+
         ph: null,
         tds: null,
+
+        tcs3448_f1: null,
+        tcs3448_f2: null,
+        tcs3448_fz: null,
+        tcs3448_f3: null,
+        tcs3448_f4: null,
+        tcs3448_f5: null,
+        tcs3448_fy: null,
+        tcs3448_fxl: null,
+        tcs3448_f6: null,
+        tcs3448_f7: null,
+        tcs3448_f8: null,
+        tcs3448_nir: null,
         tcs3448_clear: null,
-        tcs3448_red: null,
-        tcs3448_green: null,
-        tcs3448_blue: null
+        tcs3448_flicker: null
+
     };
 
-    document.getElementById(
-        "ph-value"
-    ).textContent =
-        "--";
 
-    document.getElementById(
-        "tds-value"
-    ).textContent =
-        "--";
+    const phValue =
+        document.getElementById(
+            "ph-value"
+        );
 
-    document.getElementById(
-        "tcs-value"
-    ).textContent =
-        "--";
 
-    document.getElementById(
-        "save-sample"
-    ).disabled =
-        true;
+    const tdsValue =
+        document.getElementById(
+            "tds-value"
+        );
+
+
+    const tcsValue =
+        document.getElementById(
+            "tcs-value"
+        );
+
+
+    if (phValue) {
+        phValue.textContent =
+            "--";
+    }
+
+
+    if (tdsValue) {
+        tdsValue.textContent =
+            "--";
+    }
+
+
+    if (tcsValue) {
+        tcsValue.textContent =
+            "--";
+    }
+
+
+    [
+
+        "f1",
+        "f2",
+        "fz",
+        "f3",
+        "f4",
+        "f5",
+        "fy",
+        "fxl",
+        "f6",
+        "f7",
+        "f8",
+        "nir",
+        "clear",
+        "flicker"
+
+    ].forEach(
+        channel => {
+
+            const element =
+                document.getElementById(
+                    "tcs-" +
+                    channel
+                );
+
+
+            if (element) {
+
+                element.textContent =
+                    "--";
+
+            }
+
+        }
+    );
+
+
+    const milkType =
+        document.getElementById(
+            "milk-type"
+        );
+
+
+    const milkVolume =
+        document.getElementById(
+            "milk-volume"
+        );
+
+
+    if (milkType) {
+        milkType.value =
+            "";
+    }
+
+
+    if (milkVolume) {
+        milkVolume.value =
+            "100";
+    }
+
+
+    getAdulterantDefinitions()
+        .forEach(
+            item => {
+
+                const checkbox =
+                    document.getElementById(
+                        item.checkbox
+                    );
+
+
+                const amount =
+                    document.getElementById(
+                        item.amount
+                    );
+
+
+                const unit =
+                    document.getElementById(
+                        item.unit
+                    );
+
+
+                const fields =
+                    document.getElementById(
+                        item.fields
+                    );
+
+
+                if (checkbox) {
+
+                    checkbox.checked =
+                        false;
+
+                }
+
+
+                if (amount) {
+
+                    amount.value =
+                        "";
+
+                }
+
+
+                if (unit) {
+
+                    unit.value =
+                        item.fixedUnit;
+
+                }
+
+
+                if (fields) {
+
+                    fields.style.display =
+                        "none";
+
+                }
+
+            }
+        );
+
+
+    const note =
+        document.getElementById(
+            "pure-milk-note"
+        );
+
+
+    if (note) {
+        note.style.display =
+            "";
+    }
+
+
+    const modal =
+        document.getElementById(
+            "measurement-modal"
+        );
+
+
+    const complete =
+        document.getElementById(
+            "measurement-complete"
+        );
+
+
+    const close =
+        document.getElementById(
+            "measurement-close"
+        );
+
+
+    const log =
+        document.getElementById(
+            "measurement-log"
+        );
+
+
+    if (modal) {
+
+        modal.classList.remove(
+            "active"
+        );
+
+
+        delete modal.dataset.sensor;
+
+    }
+
+
+    if (complete) {
+
+        complete.classList.remove(
+            "active"
+        );
+
+    }
+
+
+    if (close) {
+
+        close.disabled =
+            true;
+
+    }
+
+
+    if (log) {
+
+        log.innerHTML =
+            "";
+
+    }
+
+
+    const saveButton =
+        document.getElementById(
+            "save-sample"
+        );
+
+
+    if (saveButton) {
+
+        saveButton.disabled =
+            true;
+
+    }
+
 
     measurementInProgress =
         false;
 
+
     setMeasurementButtons(
         false
     );
+
 }
+
 
 function setMeasurementButtons(
     disabled
 ) {
 
     const buttons = [
+
         document.getElementById(
             "measure-ph"
         ),
@@ -1195,15 +2756,21 @@ function setMeasurementButtons(
         document.getElementById(
             "measure-tcs"
         )
+
     ];
+
 
     buttons.forEach(
         button => {
 
             if (button) {
+
                 button.disabled =
                     disabled;
+
             }
+
         }
     );
+
 }
