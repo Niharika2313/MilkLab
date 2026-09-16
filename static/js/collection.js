@@ -1,7 +1,6 @@
 let sampleData = {
     ph: null,
     tds: null,
-
     tcs3448_f1: null,
     tcs3448_f2: null,
     tcs3448_fz: null,
@@ -20,106 +19,54 @@ let sampleData = {
 
 let measurementInProgress = false;
 
+document.addEventListener("DOMContentLoaded", function () {
+    loadNextSampleId();
 
-document.addEventListener(
-    "DOMContentLoaded",
-    function () {
+    const milkType = document.getElementById("milk-type");
+    const milkVolume = document.getElementById("milk-volume-ml");
 
-        loadNextSampleId();
-
-
-        const milkType =
-            document.getElementById(
-                "milk-type"
-            );
-
-
-        const milkVolume =
-            document.getElementById(
-                "milk-volume"
-            );
-
-
-        if (milkType) {
-
-            milkType.addEventListener(
-                "input",
-                checkCanSave
-            );
-
-            milkType.addEventListener(
-                "change",
-                checkCanSave
-            );
-        }
-
-
-        if (milkVolume) {
-
-            milkVolume.addEventListener(
-                "input",
-                checkCanSave
-            );
-
-            milkVolume.addEventListener(
-                "change",
-                checkCanSave
-            );
-        }
-
-
-        getAdulterantDefinitions()
-            .forEach(item => {
-
-                const checkbox =
-                    document.getElementById(
-                        item.checkbox
-                    );
-
-                const amount =
-                    document.getElementById(
-                        item.amount
-                    );
-
-
-                if (checkbox) {
-
-                    checkbox.addEventListener(
-                        "change",
-                        updateAdulterantFields
-                    );
-                }
-
-
-                if (amount) {
-
-                    amount.addEventListener(
-                        "input",
-                        checkCanSave
-                    );
-
-                    amount.addEventListener(
-                        "change",
-                        checkCanSave
-                    );
-                }
-
-            });
-
-
-        updateAdulterantFields();
-        checkCanSave();
-
+    if (milkType) {
+        milkType.addEventListener("input", checkCanSave);
+        milkType.addEventListener("change", checkCanSave);
     }
-);
+
+    if (milkVolume) {
+        milkVolume.addEventListener("input", checkCanSave);
+        milkVolume.addEventListener("change", checkCanSave);
+    }
+
+    getAdulterantDefinitions().forEach(item => {
+        const checkbox = document.getElementById(item.checkbox);
+        const amount = document.getElementById(item.amount);
+
+        if (checkbox) {
+            checkbox.addEventListener(
+                "change",
+                updateAdulterantFields
+            );
+        }
+
+        if (amount) {
+            amount.addEventListener(
+                "input",
+                checkCanSave
+            );
+
+            amount.addEventListener(
+                "change",
+                checkCanSave
+            );
+        }
+    });
+
+    updateAdulterantFields();
+    checkCanSave();
+});
 
 
 function loadNextSampleId() {
 
-    fetch(
-        "/api/next-sample-id"
-    )
-
+    fetch("/api/next-sample-id")
         .then(response => {
 
             if (!response.ok) {
@@ -142,7 +89,6 @@ function loadNextSampleId() {
                 element.textContent =
                     data.sample_id;
             }
-
         })
 
         .catch(error => {
@@ -155,14 +101,15 @@ function loadNextSampleId() {
                 );
 
             if (element) {
-                element.textContent =
-                    "Error";
+                element.textContent = "Error";
             }
-
         });
-
 }
 
+
+// ============================================================
+// ADULTERANT DEFINITIONS
+// ============================================================
 
 function getAdulterantDefinitions() {
 
@@ -171,190 +118,124 @@ function getAdulterantDefinitions() {
         {
             name: "Water",
             key: "water",
-
-            checkbox:
-                "water-present",
-
-            amount:
-                "water-amount",
-
-            unit:
-                "water-unit",
-
-            fixedUnit:
-                "mL",
-
-            fields:
-                "water-fields"
+            checkbox: "water-present",
+            amount: "water-amount",
+            unit: "water-unit",
+            fixedUnit: "mL",
+            fields: "water-fields"
         },
-
 
         {
             name: "Urea",
             key: "urea",
-
-            checkbox:
-                "urea-present",
-
-            amount:
-                "urea-amount",
-
-            unit:
-                "urea-unit",
-
-            fixedUnit:
-                "tsp",
-
-            fields:
-                "urea-fields"
+            checkbox: "urea-present",
+            amount: "urea-amount",
+            unit: "urea-unit",
+            fixedUnit: "tsp",
+            fields: "urea-fields"
         },
-
 
         {
             name: "Starch",
             key: "starch",
-
-            checkbox:
-                "starch-present",
-
-            amount:
-                "starch-amount",
-
-            unit:
-                "starch-unit",
-
-            fixedUnit:
-                "tsp",
-
-            fields:
-                "starch-fields"
+            checkbox: "starch-present",
+            amount: "starch-amount",
+            unit: "starch-unit",
+            fixedUnit: "tsp",
+            fields: "starch-fields"
         },
-
 
         {
             name: "Detergent",
             key: "detergent",
-
-            checkbox:
-                "detergent-present",
-
-            amount:
-                "detergent-amount",
-
-            unit:
-                "detergent-unit",
-
-            fixedUnit:
-                "mL",
-
-            fields:
-                "detergent-fields"
+            checkbox: "detergent-present",
+            amount: "detergent-amount",
+            unit: "detergent-unit",
+            fixedUnit: "tsp",
+            fields: "detergent-fields"
         }
-
     ];
-
 }
 
+
+// ============================================================
+// UPDATE ADULTERANT FIELDS
+// ============================================================
 
 function updateAdulterantFields() {
 
     const definitions =
         getAdulterantDefinitions();
 
+    let anySelected = false;
 
-    let anySelected =
-        false;
+    definitions.forEach(item => {
 
+        const checkbox =
+            document.getElementById(
+                item.checkbox
+            );
 
-    definitions.forEach(
-        item => {
+        const fields =
+            document.getElementById(
+                item.fields
+            );
 
-            const checkbox =
-                document.getElementById(
-                    item.checkbox
-                );
+        const amount =
+            document.getElementById(
+                item.amount
+            );
 
+        const unit =
+            document.getElementById(
+                item.unit
+            );
 
-            const fields =
-                document.getElementById(
-                    item.fields
-                );
+        const selected =
+            checkbox &&
+            checkbox.checked;
 
-
-            const amount =
-                document.getElementById(
-                    item.amount
-                );
-
-
-            const unit =
-                document.getElementById(
-                    item.unit
-                );
-
-
-            const selected =
-                checkbox &&
-                checkbox.checked;
-
-
-            if (selected) {
-                anySelected = true;
-            }
-
-
-            if (fields) {
-
-                fields.style.display =
-                    selected
-                        ? "flex"
-                        : "none";
-            }
-
-
-            if (!selected && amount) {
-                amount.value = "";
-            }
-
-
-            if (unit) {
-                unit.value =
-                    item.fixedUnit;
-            }
-
+        if (selected) {
+            anySelected = true;
         }
-    );
 
+        if (fields) {
+            fields.style.display =
+                selected
+                    ? "flex"
+                    : "none";
+        }
+
+        if (!selected && amount) {
+            amount.value = "";
+        }
+
+        if (unit) {
+            unit.value =
+                item.fixedUnit;
+        }
+    });
 
     const note =
         document.getElementById(
             "pure-milk-note"
         );
 
-
     if (note) {
-
         note.style.display =
             anySelected
                 ? "none"
                 : "";
-
     }
 
-
     checkCanSave();
-
 }
 
 
 function getSelectedAdulterants() {
 
-    const definitions =
-        getAdulterantDefinitions();
-
-
-    return definitions.filter(
-        item => {
+    return getAdulterantDefinitions()
+        .filter(item => {
 
             const checkbox =
                 document.getElementById(
@@ -365,47 +246,40 @@ function getSelectedAdulterants() {
                 checkbox &&
                 checkbox.checked
             );
-
-        }
-    );
-
+        });
 }
 
+
+// ============================================================
+// VALIDATE ADULTERANTS
+// ============================================================
 
 function validateAdulterants() {
 
     const selected =
         getSelectedAdulterants();
 
-
-    for (
-        const item of selected
-    ) {
+    for (const item of selected) {
 
         const amountElement =
             document.getElementById(
                 item.amount
             );
 
-
         if (!amountElement) {
 
             return {
                 valid: false,
-
                 message:
                     item.name +
                     " amount field is missing."
             };
-
         }
-
 
         const amount =
             parseFloat(
                 amountElement.value
             );
-
 
         if (
             isNaN(amount) ||
@@ -414,53 +288,46 @@ function validateAdulterants() {
 
             return {
                 valid: false,
-
                 message:
                     "Enter a valid amount for " +
                     item.name +
                     "."
             };
-
         }
-
 
         const unitElement =
             document.getElementById(
                 item.unit
             );
 
-
         if (unitElement) {
-
             unitElement.value =
                 item.fixedUnit;
         }
-
     }
-
 
     return {
         valid: true
     };
-
 }
 
+
+// ============================================================
+// GET ADULTERANT DATA
+// ============================================================
 
 function getAdulterantData() {
 
     const definitions =
         getAdulterantDefinitions();
 
-
     const selected =
         getSelectedAdulterants();
-
 
     const names =
         selected.map(
             item => item.name
         );
-
 
     const result = {
 
@@ -469,83 +336,67 @@ function getAdulterantData() {
                 ? names.join(" + ")
                 : "Pure Milk",
 
-
         water_present: 0,
         urea_present: 0,
         starch_present: 0,
         detergent_present: 0,
 
-
         water_amount: null,
         water_unit: null,
-
 
         urea_amount: null,
         urea_unit: null,
 
-
         starch_amount: null,
         starch_unit: null,
 
-
         detergent_amount: null,
         detergent_unit: null
-
     };
 
+    definitions.forEach(item => {
 
-    definitions.forEach(
-        item => {
+        const checkbox =
+            document.getElementById(
+                item.checkbox
+            );
 
-            const checkbox =
-                document.getElementById(
-                    item.checkbox
-                );
-
-
-            if (
-                !checkbox ||
-                !checkbox.checked
-            ) {
-                return;
-            }
-
-
-            result[
-                item.key +
-                "_present"
-            ] = 1;
-
-
-            const amountElement =
-                document.getElementById(
-                    item.amount
-                );
-
-
-            result[
-                item.key +
-                "_amount"
-            ] =
-                parseFloat(
-                    amountElement.value
-                );
-
-
-            result[
-                item.key +
-                "_unit"
-            ] =
-                item.fixedUnit;
-
+        if (
+            !checkbox ||
+            !checkbox.checked
+        ) {
+            return;
         }
-    );
 
+        result[
+            item.key + "_present"
+        ] = 1;
+
+        const amountElement =
+            document.getElementById(
+                item.amount
+            );
+
+        result[
+            item.key + "_amount"
+        ] =
+            parseFloat(
+                amountElement.value
+            );
+
+        result[
+            item.key + "_unit"
+        ] =
+            item.fixedUnit;
+    });
 
     return result;
-
 }
 
+
+// ============================================================
+// MEASURE SENSOR
+// ============================================================
 
 function measureSensor(sensor) {
 
@@ -559,7 +410,6 @@ function measureSensor(sensor) {
         return;
     }
 
-
     if (measurementInProgress) {
 
         showMessage(
@@ -569,7 +419,6 @@ function measureSensor(sensor) {
 
         return;
     }
-
 
     if (
         window.sensorStates &&
@@ -585,15 +434,12 @@ function measureSensor(sensor) {
         return;
     }
 
-
     measurementInProgress =
         true;
-
 
     setMeasurementButtons(
         true
     );
-
 
     if (
         sensor === "ph" ||
@@ -603,9 +449,7 @@ function measureSensor(sensor) {
         openMeasurementModal(
             sensor
         );
-
     }
-
 
     showMessage(
         "Requesting " +
@@ -614,157 +458,134 @@ function measureSensor(sensor) {
         "normal"
     );
 
-
     socket.emit(
         "sensor_command",
         {
             sensor: sensor
         }
     );
-
 }
 
 
-function openMeasurementModal(
-    sensor
-) {
+// ============================================================
+// OPEN MEASUREMENT MODAL
+// ============================================================
+
+function openMeasurementModal(sensor) {
 
     const modal =
         document.getElementById(
             "measurement-modal"
         );
 
-
     if (!modal) {
         return;
     }
-
 
     const title =
         document.getElementById(
             "measurement-title"
         );
 
-
     const subtitle =
         document.getElementById(
             "measurement-subtitle"
         );
-
 
     const status =
         document.getElementById(
             "measurement-status-text"
         );
 
-
     const currentValue =
         document.getElementById(
             "measurement-current-value"
         );
-
 
     const currentUnit =
         document.getElementById(
             "measurement-current-unit"
         );
 
-
     const finalUnit =
         document.getElementById(
             "measurement-final-unit"
         );
-
 
     const readingCount =
         document.getElementById(
             "measurement-reading-count"
         );
 
-
     const progressFill =
         document.getElementById(
             "measurement-progress-fill"
         );
-
 
     const range =
         document.getElementById(
             "measurement-range"
         );
 
-
     const stableWindows =
         document.getElementById(
             "measurement-stable-windows"
         );
-
 
     const secondaryLabel =
         document.getElementById(
             "measurement-stability-label"
         );
 
-
     const log =
         document.getElementById(
             "measurement-log"
         );
-
 
     const complete =
         document.getElementById(
             "measurement-complete"
         );
 
-
     const close =
         document.getElementById(
             "measurement-close"
         );
-
 
     const completeMessage =
         document.getElementById(
             "measurement-complete-message"
         );
 
-
     if (currentValue) {
         currentValue.textContent =
             "--";
     }
-
 
     if (readingCount) {
         readingCount.textContent =
             "0 / 0";
     }
 
-
     if (progressFill) {
         progressFill.style.width =
             "0%";
     }
-
 
     if (range) {
         range.textContent =
             "--";
     }
 
-
     if (stableWindows) {
         stableWindows.textContent =
             "--";
     }
 
-
     if (log) {
         log.innerHTML =
             "";
     }
-
 
     if (complete) {
         complete.classList.remove(
@@ -772,12 +593,10 @@ function openMeasurementModal(
         );
     }
 
-
     if (close) {
         close.disabled =
             true;
     }
-
 
     if (sensor === "ph") {
 
@@ -786,56 +605,46 @@ function openMeasurementModal(
                 "pH Measurement";
         }
 
-
         if (subtitle) {
             subtitle.textContent =
                 "Stabilizing electrode...";
         }
-
 
         if (status) {
             status.textContent =
                 "Measurement in progress";
         }
 
-
         if (readingCount) {
             readingCount.textContent =
                 "0 / 8";
         }
-
 
         if (stableWindows) {
             stableWindows.textContent =
                 "0 / 3";
         }
 
-
         if (currentUnit) {
             currentUnit.textContent =
                 "pH";
         }
-
 
         if (finalUnit) {
             finalUnit.textContent =
                 "pH";
         }
 
-
         if (secondaryLabel) {
             secondaryLabel.textContent =
                 "Stable Windows";
         }
 
-
         if (completeMessage) {
             completeMessage.textContent =
                 "Stable pH reading confirmed successfully.";
         }
-
     }
-
 
     if (sensor === "tds") {
 
@@ -844,115 +653,94 @@ function openMeasurementModal(
                 "TDS Measurement";
         }
 
-
         if (subtitle) {
             subtitle.textContent =
                 "Collecting TDS readings...";
         }
-
 
         if (status) {
             status.textContent =
                 "Measurement in progress";
         }
 
-
         if (readingCount) {
             readingCount.textContent =
                 "0 / 30";
         }
-
 
         if (stableWindows) {
             stableWindows.textContent =
                 "--";
         }
 
-
         if (currentUnit) {
             currentUnit.textContent =
                 "ppm";
         }
-
 
         if (finalUnit) {
             finalUnit.textContent =
                 "ppm";
         }
 
-
         if (secondaryLabel) {
             secondaryLabel.textContent =
                 "Average";
         }
 
-
         if (completeMessage) {
             completeMessage.textContent =
                 "TDS measurement completed successfully.";
         }
-
     }
-
 
     modal.dataset.sensor =
         sensor;
-
 
     modal.classList.add(
         "active"
     );
 
-
     addMeasurementLog(
         "Measurement started."
     );
 
-
     if (sensor === "ph") {
-
         addMeasurementLog(
             "Checking pH electrode stability..."
         );
-
     }
 
-
     if (sensor === "tds") {
-
         addMeasurementLog(
             "Collecting 30 TDS readings..."
         );
-
     }
-
 }
 
 
-function addMeasurementLog(
-    message
-) {
+// ============================================================
+// MEASUREMENT LOG
+// ============================================================
+
+function addMeasurementLog(message) {
 
     const log =
         document.getElementById(
             "measurement-log"
         );
 
-
     if (!log) {
         return;
     }
-
 
     const entry =
         document.createElement(
             "div"
         );
 
-
     entry.className =
         "measurement-log-entry";
-
 
     const time =
         new Date().toLocaleTimeString(
@@ -964,70 +752,66 @@ function addMeasurementLog(
             }
         );
 
-
     entry.textContent =
         "[" +
         time +
         "] " +
         message;
 
-
     log.appendChild(
         entry
     );
 
-
     log.scrollTop =
         log.scrollHeight;
-
 }
 
 
-function updatePHProgress(
-    data
-) {
+// ============================================================
+// pH PROGRESS
+// ============================================================
+
+function updatePHProgress(data) {
 
     const currentValue =
         document.getElementById(
             "measurement-current-value"
         );
 
+    const phDashboardValue =
+        document.getElementById(
+            "ph-value"
+        );
 
     const readingCount =
         document.getElementById(
             "measurement-reading-count"
         );
 
-
     const progressFill =
         document.getElementById(
             "measurement-progress-fill"
         );
-
 
     const range =
         document.getElementById(
             "measurement-range"
         );
 
-
     const stableWindows =
         document.getElementById(
             "measurement-stable-windows"
         );
-
 
     const subtitle =
         document.getElementById(
             "measurement-subtitle"
         );
 
-
     const unit =
         document.getElementById(
             "measurement-current-unit"
         );
-
 
     const secondaryLabel =
         document.getElementById(
@@ -1047,23 +831,86 @@ function updatePHProgress(
     }
 
 
-    if (currentValue) {
+    /*
+     * IMPORTANT:
+     *
+     * The ESP32 sends an initial progress packet
+     * with:
+     *
+     * current_ph = 0
+     * readings   = 0
+     *
+     * That is NOT a real pH measurement.
+     *
+     * Therefore ignore it.
+     */
 
-        currentValue.textContent =
+
+    if (
+        currentValue &&
+        data.current_ph !== undefined &&
+        Number(data.readings) > 0
+    ) {
+
+        const livePH =
             Number(
                 data.current_ph
-            ).toFixed(2);
+            );
 
+        if (
+            Number.isFinite(
+                livePH
+            )
+        ) {
+
+            currentValue.textContent =
+                livePH.toFixed(2);
+        }
     }
 
 
-    if (readingCount) {
+    /*
+     * LIVE pH ON MAIN COLLECTION PAGE
+     *
+     * This updates the displayed pH
+     * immediately without changing
+     * sampleData.ph.
+     */
+
+
+    if (
+        phDashboardValue &&
+        data.current_ph !== undefined &&
+        Number(data.readings) > 0
+    ) {
+
+        const livePH =
+            Number(
+                data.current_ph
+            );
+
+        if (
+            Number.isFinite(
+                livePH
+            )
+        ) {
+
+            phDashboardValue.textContent =
+                livePH.toFixed(2);
+        }
+    }
+
+
+    if (
+        readingCount &&
+        data.readings !== undefined &&
+        data.total_readings !== undefined
+    ) {
 
         readingCount.textContent =
             data.readings +
             " / " +
             data.total_readings;
-
     }
 
 
@@ -1076,38 +923,48 @@ function updatePHProgress(
             (
                 data.readings /
                 data.total_readings
-            ) *
-            100;
-
+            ) * 100;
 
         progressFill.style.width =
             Math.min(
                 percentage,
                 100
-            ) +
-            "%";
-
+            ) + "%";
     }
 
 
-    if (range) {
+    if (
+        range &&
+        data.range !== undefined
+    ) {
 
-        range.textContent =
+        const phRange =
             Number(
                 data.range
-            ).toFixed(3) +
-            " pH";
+            );
 
+        if (
+            Number.isFinite(
+                phRange
+            )
+        ) {
+
+            range.textContent =
+                phRange.toFixed(3) +
+                " pH";
+        }
     }
 
 
-    if (stableWindows) {
+    if (
+        stableWindows &&
+        data.stable_windows !== undefined
+    ) {
 
         stableWindows.textContent =
             data.stable_windows +
             " / " +
             data.required_stable_windows;
-
     }
 
 
@@ -1117,79 +974,113 @@ function updatePHProgress(
             data.stable_windows > 0
                 ? "Confirming stable reading..."
                 : "Stabilizing electrode...";
-
     }
 
 
-    addMeasurementLog(
+    /*
+     * Add log only for a real reading.
+     */
+    if (
+        data.current_ph !== undefined &&
+        Number(data.readings) > 0
+    ) {
 
-        "pH " +
-        Number(
-            data.current_ph
-        ).toFixed(2) +
+        const livePH =
+            Number(
+                data.current_ph
+            );
 
-        " | Range " +
+        if (
+            Number.isFinite(
+                livePH
+            )
+        ) {
 
-        Number(
-            data.range
-        ).toFixed(3) +
+            let message =
+                "pH " +
+                livePH.toFixed(2);
 
-        " | Stable " +
+            if (
+                data.range !== undefined
+            ) {
 
-        data.stable_windows +
-        "/" +
-        data.required_stable_windows
+                const phRange =
+                    Number(
+                        data.range
+                    );
 
-    );
+                if (
+                    Number.isFinite(
+                        phRange
+                    )
+                ) {
 
+                    message +=
+                        " | Range " +
+                        phRange.toFixed(3);
+                }
+            }
+
+            if (
+                data.stable_windows !== undefined &&
+                data.required_stable_windows !== undefined
+            ) {
+
+                message +=
+                    " | Stable " +
+                    data.stable_windows +
+                    "/" +
+                    data.required_stable_windows;
+            }
+
+            addMeasurementLog(
+                message
+            );
+        }
+    }
 }
 
 
-function updateTDSProgress(
-    data
-) {
+// ============================================================
+// TDS PROGRESS
+// ============================================================
+
+function updateTDSProgress(data) {
 
     const currentValue =
         document.getElementById(
             "measurement-current-value"
         );
 
-
     const readingCount =
         document.getElementById(
             "measurement-reading-count"
         );
-
 
     const progressFill =
         document.getElementById(
             "measurement-progress-fill"
         );
 
-
     const range =
         document.getElementById(
             "measurement-range"
         );
-
 
     const average =
         document.getElementById(
             "measurement-stable-windows"
         );
 
-
     const subtitle =
         document.getElementById(
             "measurement-subtitle"
         );
 
-
     const unit =
         document.getElementById(
             "measurement-current-unit"
         );
-
 
     const secondaryLabel =
         document.getElementById(
@@ -1218,7 +1109,6 @@ function updateTDSProgress(
             Number(
                 data.current_tds
             ).toFixed(1);
-
     }
 
 
@@ -1233,7 +1123,6 @@ function updateTDSProgress(
                 data.readings +
                 " / " +
                 data.total_readings;
-
         }
 
 
@@ -1243,19 +1132,14 @@ function updateTDSProgress(
                 (
                     data.readings /
                     data.total_readings
-                ) *
-                100;
-
+                ) * 100;
 
             progressFill.style.width =
                 Math.min(
                     percentage,
                     100
-                ) +
-                "%";
-
+                ) + "%";
         }
-
     }
 
 
@@ -1269,7 +1153,6 @@ function updateTDSProgress(
                 data.range
             ).toFixed(1) +
             " ppm";
-
     }
 
 
@@ -1283,7 +1166,6 @@ function updateTDSProgress(
                 data.average
             ).toFixed(1) +
             " ppm";
-
     }
 
 
@@ -1294,113 +1176,99 @@ function updateTDSProgress(
             data.total_readings
                 ? "Collecting TDS readings..."
                 : "Calculating final TDS...";
-
     }
 
 
     if (
-        data.current_tds !==
-        undefined
+        data.current_tds !== undefined
     ) {
 
-        addMeasurementLog(
-
+        let message =
             "TDS " +
-
             Number(
                 data.current_tds
             ).toFixed(1) +
+            " ppm";
 
-            " ppm" +
 
-            (
-                data.range !==
-                undefined
+        if (
+            data.range !== undefined
+        ) {
 
-                    ? " | Range " +
+            message +=
+                " | Range " +
+                Number(
+                    data.range
+                ).toFixed(1) +
+                " ppm";
+        }
 
-                      Number(
-                          data.range
-                      ).toFixed(1) +
 
-                      " ppm"
+        if (
+            data.average !== undefined
+        ) {
 
-                    : ""
-            ) +
+            message +=
+                " | Average " +
+                Number(
+                    data.average
+                ).toFixed(1) +
+                " ppm";
+        }
 
-            (
-                data.average !==
-                undefined
 
-                    ? " | Average " +
-
-                      Number(
-                          data.average
-                      ).toFixed(1) +
-
-                      " ppm"
-
-                    : ""
-            )
-
+        addMeasurementLog(
+            message
         );
-
     }
-
 }
 
 
-function completeMeasurement(
-    value
-) {
+// ============================================================
+// COMPLETE pH MEASUREMENT
+// ============================================================
+
+function completeMeasurement(value) {
 
     const subtitle =
         document.getElementById(
             "measurement-subtitle"
         );
 
-
     const status =
         document.getElementById(
             "measurement-status-text"
         );
-
 
     const finalValue =
         document.getElementById(
             "measurement-final-value"
         );
 
-
     const finalUnit =
         document.getElementById(
             "measurement-final-unit"
         );
-
 
     const complete =
         document.getElementById(
             "measurement-complete"
         );
 
-
     const close =
         document.getElementById(
             "measurement-close"
         );
-
 
     const progressFill =
         document.getElementById(
             "measurement-progress-fill"
         );
 
-
     const unit =
         document.getElementById(
             "measurement-current-unit"
         );
-
 
     const completeMessage =
         document.getElementById(
@@ -1421,10 +1289,8 @@ function completeMeasurement(
 
 
     if (completeMessage) {
-
         completeMessage.textContent =
             "Stable pH reading confirmed successfully.";
-
     }
 
 
@@ -1441,12 +1307,10 @@ function completeMeasurement(
 
 
     if (finalValue) {
-
         finalValue.textContent =
             Number(
                 value
             ).toFixed(2);
-
     }
 
 
@@ -1470,84 +1334,74 @@ function completeMeasurement(
 
 
     addMeasurementLog(
-
         "Final stabilized pH: " +
-
         Number(
             value
         ).toFixed(2)
-
     );
-
 }
 
 
-function completeTDSMeasurement(
-    value
-) {
+// ============================================================
+// COMPLETE TDS MEASUREMENT
+// ============================================================
+
+function completeTDSMeasurement(value) {
 
     const subtitle =
         document.getElementById(
             "measurement-subtitle"
         );
 
-
     const status =
         document.getElementById(
             "measurement-status-text"
         );
-
 
     const finalValue =
         document.getElementById(
             "measurement-final-value"
         );
 
-
     const finalUnit =
         document.getElementById(
             "measurement-final-unit"
         );
-
 
     const complete =
         document.getElementById(
             "measurement-complete"
         );
 
-
     const close =
         document.getElementById(
             "measurement-close"
         );
-
 
     const progressFill =
         document.getElementById(
             "measurement-progress-fill"
         );
 
-
     const unit =
         document.getElementById(
             "measurement-current-unit"
         );
-
 
     const completeMessage =
         document.getElementById(
             "measurement-complete-message"
         );
 
-
     const tdsValue =
         document.getElementById(
             "tds-value"
         );
 
-
     const finalTDS =
-        Number(value);
+        Number(
+            value
+        );
 
 
     if (unit) {
@@ -1563,10 +1417,8 @@ function completeTDSMeasurement(
 
 
     if (completeMessage) {
-
         completeMessage.textContent =
             "TDS measurement completed successfully.";
-
     }
 
 
@@ -1583,19 +1435,15 @@ function completeTDSMeasurement(
 
 
     if (finalValue) {
-
         finalValue.textContent =
             finalTDS.toFixed(1);
-
     }
 
 
     if (tdsValue) {
-
         tdsValue.textContent =
             finalTDS.toFixed(1) +
             " ppm";
-
     }
 
 
@@ -1619,15 +1467,16 @@ function completeTDSMeasurement(
 
 
     addMeasurementLog(
-
         "Final TDS: " +
         finalTDS.toFixed(1) +
         " ppm"
-
     );
-
 }
 
+
+// ============================================================
+// CLOSE MEASUREMENT MODAL
+// ============================================================
 
 function closeMeasurementModal() {
 
@@ -1636,17 +1485,17 @@ function closeMeasurementModal() {
             "measurement-modal"
         );
 
-
     if (modal) {
-
         modal.classList.remove(
             "active"
         );
-
     }
-
 }
 
+
+// ============================================================
+// pH PROGRESS SOCKET
+// ============================================================
 
 socket.on(
     "ph_progress",
@@ -1655,10 +1504,13 @@ socket.on(
         updatePHProgress(
             data
         );
-
     }
 );
 
+
+// ============================================================
+// TDS PROGRESS SOCKET
+// ============================================================
 
 socket.on(
     "tds_progress",
@@ -1667,10 +1519,13 @@ socket.on(
         updateTDSProgress(
             data
         );
-
     }
 );
 
+
+// ============================================================
+// SENSOR RESULT
+// ============================================================
 
 socket.on(
     "sensor_result",
@@ -1682,10 +1537,16 @@ socket.on(
         );
 
 
+        // ==================== pH ====================
+
         if (
             data.sensor === "ph"
         ) {
 
+            /*
+             * ONLY THE FINAL STABILIZED
+             * pH IS STORED AS sampleData.ph
+             */
             sampleData.ph =
                 Number(
                     data.value
@@ -1704,7 +1565,6 @@ socket.on(
                     Number(
                         data.value
                     ).toFixed(2);
-
             }
 
 
@@ -1720,9 +1580,10 @@ socket.on(
             completeMeasurement(
                 data.value
             );
-
         }
 
+
+        // ==================== TDS ====================
 
         if (
             data.sensor === "tds"
@@ -1747,7 +1608,6 @@ socket.on(
                         data.value
                     ).toFixed(1) +
                     " ppm";
-
             }
 
 
@@ -1763,15 +1623,17 @@ socket.on(
             completeTDSMeasurement(
                 data.value
             );
-
         }
 
 
         checkCanSave();
-
     }
 );
 
+
+// ============================================================
+// TCS3448 RESULT
+// ============================================================
 
 socket.on(
     "tcs3448_result",
@@ -1808,7 +1670,6 @@ socket.on(
             "nir",
             "clear",
             "flicker"
-
         ];
 
 
@@ -1856,9 +1717,7 @@ socket.on(
 
                     element.textContent =
                         value.toFixed(0);
-
                 }
-
             }
         );
 
@@ -1869,7 +1728,6 @@ socket.on(
                 "TCS3448 measurement received invalid data.",
                 "error"
             );
-
 
             checkCanSave();
 
@@ -1884,10 +1742,8 @@ socket.on(
 
 
         if (tcsValue) {
-
             tcsValue.textContent =
                 "Measured";
-
         }
 
 
@@ -1898,10 +1754,13 @@ socket.on(
 
 
         checkCanSave();
-
     }
 );
 
+
+// ============================================================
+// SENSOR ERROR
+// ============================================================
 
 socket.on(
     "sensor_error",
@@ -1929,14 +1788,11 @@ socket.on(
 
 
         addMeasurementLog(
-
             "ERROR: " +
-
             (
                 data.message ||
                 "Sensor measurement failed."
             )
-
         );
 
 
@@ -1956,7 +1812,6 @@ socket.on(
 
             subtitle.textContent =
                 "Measurement failed";
-
         }
 
 
@@ -1964,25 +1819,24 @@ socket.on(
 
             status.textContent =
                 "Unable to complete measurement";
-
         }
 
 
         showMessage(
-
             data.message ||
             "Sensor measurement failed.",
-
             "error"
-
         );
 
 
         checkCanSave();
-
     }
 );
 
+
+// ============================================================
+// COMMAND ERROR
+// ============================================================
 
 socket.on(
     "command_error",
@@ -2008,25 +1862,24 @@ socket.on(
             modal.classList.remove(
                 "active"
             );
-
         }
 
 
         showMessage(
-
             data.message ||
             "Sensor command failed.",
-
             "error"
-
         );
 
 
         checkCanSave();
-
     }
 );
 
+
+// ============================================================
+// COMMAND ACCEPTED
+// ============================================================
 
 socket.on(
     "command_accepted",
@@ -2040,12 +1893,14 @@ socket.on(
             addMeasurementLog(
                 "Command received by ESP32."
             );
-
         }
-
     }
 );
 
+
+// ============================================================
+// CHECK CAN SAVE
+// ============================================================
 
 function checkCanSave() {
 
@@ -2054,10 +1909,9 @@ function checkCanSave() {
             "milk-type"
         );
 
-
     const milkVolume =
         document.getElementById(
-            "milk-volume"
+            "milk-volume-ml"
         );
 
 
@@ -2101,7 +1955,6 @@ function checkCanSave() {
         "nir",
         "clear",
         "flicker"
-
     ];
 
 
@@ -2136,7 +1989,6 @@ function checkCanSave() {
                         value
                     )
                 );
-
             }
         );
 
@@ -2160,24 +2012,22 @@ function checkCanSave() {
 
         button.disabled =
             !ready;
-
     }
 
 
     if (ready) {
 
         showMessage(
-
             "All sample information and sensor measurements are ready. Sample can be saved.",
-
             "success"
-
         );
-
     }
-
 }
 
+
+// ============================================================
+// SAVE SAMPLE
+// ============================================================
 
 function saveSample() {
 
@@ -2206,7 +2056,7 @@ function saveSample() {
 
     const milkVolumeElement =
         document.getElementById(
-            "milk-volume"
+            "milk-volume-ml"
         );
 
 
@@ -2260,126 +2110,95 @@ function saveSample() {
         milk_type:
             milkType,
 
-
         milk_volume_ml:
             milkVolume,
-
 
         adulterant:
             adulterantData.adulterant,
 
-
         water_present:
             adulterantData.water_present,
-
 
         urea_present:
             adulterantData.urea_present,
 
-
         starch_present:
             adulterantData.starch_present,
-
 
         detergent_present:
             adulterantData.detergent_present,
 
-
         water_amount:
             adulterantData.water_amount,
-
 
         water_unit:
             adulterantData.water_unit,
 
-
         urea_amount:
             adulterantData.urea_amount,
-
 
         urea_unit:
             adulterantData.urea_unit,
 
-
         starch_amount:
             adulterantData.starch_amount,
-
 
         starch_unit:
             adulterantData.starch_unit,
 
-
         detergent_amount:
             adulterantData.detergent_amount,
-
 
         detergent_unit:
             adulterantData.detergent_unit,
 
-
         ph:
             sampleData.ph,
-
 
         tds:
             sampleData.tds,
 
-
         tcs3448_f1:
             sampleData.tcs3448_f1,
-
 
         tcs3448_f2:
             sampleData.tcs3448_f2,
 
-
         tcs3448_fz:
             sampleData.tcs3448_fz,
-
 
         tcs3448_f3:
             sampleData.tcs3448_f3,
 
-
         tcs3448_f4:
             sampleData.tcs3448_f4,
-
 
         tcs3448_f5:
             sampleData.tcs3448_f5,
 
-
         tcs3448_fy:
             sampleData.tcs3448_fy,
-
 
         tcs3448_fxl:
             sampleData.tcs3448_fxl,
 
-
         tcs3448_f6:
             sampleData.tcs3448_f6,
-
 
         tcs3448_f7:
             sampleData.tcs3448_f7,
 
-
         tcs3448_f8:
             sampleData.tcs3448_f8,
-
 
         tcs3448_nir:
             sampleData.tcs3448_nir,
 
-
         tcs3448_clear:
             sampleData.tcs3448_clear,
 
-
         tcs3448_flicker:
             sampleData.tcs3448_flicker
-
     };
 
 
@@ -2393,9 +2212,12 @@ function saveSample() {
         "save_sample",
         data
     );
-
 }
 
+
+// ============================================================
+// SAMPLE SAVED
+// ============================================================
 
 socket.on(
     "sample_saved",
@@ -2404,13 +2226,10 @@ socket.on(
         if (data.success) {
 
             showMessage(
-
                 "Sample " +
                 data.sample_id +
                 " saved successfully.",
-
                 "success"
-
             );
 
 
@@ -2429,31 +2248,28 @@ socket.on(
 
                     sampleId.textContent =
                         data.next_sample_id;
-
                 }
 
             } else {
 
                 loadNextSampleId();
-
             }
 
         } else {
 
             showMessage(
-
                 data.error ||
                 "Failed to save sample.",
-
                 "error"
-
             );
-
         }
-
     }
 );
 
+
+// ============================================================
+// RESET SAMPLE
+// ============================================================
 
 function resetMeasurement() {
 
@@ -2476,7 +2292,6 @@ function resetMeasurement() {
         tcs3448_nir: null,
         tcs3448_clear: null,
         tcs3448_flicker: null
-
     };
 
 
@@ -2517,7 +2332,6 @@ function resetMeasurement() {
 
 
     [
-
         "f1",
         "f2",
         "fz",
@@ -2532,7 +2346,6 @@ function resetMeasurement() {
         "nir",
         "clear",
         "flicker"
-
     ].forEach(
         channel => {
 
@@ -2547,9 +2360,7 @@ function resetMeasurement() {
 
                 element.textContent =
                     "--";
-
             }
-
         }
     );
 
@@ -2562,7 +2373,7 @@ function resetMeasurement() {
 
     const milkVolume =
         document.getElementById(
-            "milk-volume"
+            "milk-volume-ml"
         );
 
 
@@ -2587,18 +2398,15 @@ function resetMeasurement() {
                         item.checkbox
                     );
 
-
                 const amount =
                     document.getElementById(
                         item.amount
                     );
 
-
                 const unit =
                     document.getElementById(
                         item.unit
                     );
-
 
                 const fields =
                     document.getElementById(
@@ -2610,7 +2418,6 @@ function resetMeasurement() {
 
                     checkbox.checked =
                         false;
-
                 }
 
 
@@ -2618,7 +2425,6 @@ function resetMeasurement() {
 
                     amount.value =
                         "";
-
                 }
 
 
@@ -2626,7 +2432,6 @@ function resetMeasurement() {
 
                     unit.value =
                         item.fixedUnit;
-
                 }
 
 
@@ -2634,9 +2439,7 @@ function resetMeasurement() {
 
                     fields.style.display =
                         "none";
-
                 }
-
             }
         );
 
@@ -2648,6 +2451,7 @@ function resetMeasurement() {
 
 
     if (note) {
+
         note.style.display =
             "";
     }
@@ -2683,9 +2487,7 @@ function resetMeasurement() {
             "active"
         );
 
-
         delete modal.dataset.sensor;
-
     }
 
 
@@ -2694,7 +2496,6 @@ function resetMeasurement() {
         complete.classList.remove(
             "active"
         );
-
     }
 
 
@@ -2702,7 +2503,6 @@ function resetMeasurement() {
 
         close.disabled =
             true;
-
     }
 
 
@@ -2710,7 +2510,6 @@ function resetMeasurement() {
 
         log.innerHTML =
             "";
-
     }
 
 
@@ -2724,7 +2523,6 @@ function resetMeasurement() {
 
         saveButton.disabled =
             true;
-
     }
 
 
@@ -2736,8 +2534,14 @@ function resetMeasurement() {
         false
     );
 
+
+    checkCanSave();
 }
 
+
+// ============================================================
+// MEASUREMENT BUTTONS
+// ============================================================
 
 function setMeasurementButtons(
     disabled
@@ -2756,7 +2560,6 @@ function setMeasurementButtons(
         document.getElementById(
             "measure-tcs"
         )
-
     ];
 
 
@@ -2767,10 +2570,7 @@ function setMeasurementButtons(
 
                 button.disabled =
                     disabled;
-
             }
-
         }
     );
-
 }

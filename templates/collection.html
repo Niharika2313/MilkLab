@@ -9,7 +9,6 @@
     </div>
 </div>
 
-
 <div class="collection-grid">
 
     <!-- SAMPLE INFORMATION -->
@@ -19,12 +18,10 @@
             <h2>Sample Information</h2>
         </div>
 
-
         <div class="form-group">
             <label>Sample ID</label>
             <div id="sample-id">--</div>
         </div>
-
 
         <div class="form-group">
             <label for="milk-type">Milk Type</label>
@@ -37,10 +34,9 @@
             >
         </div>
 
-
         <div class="form-group">
 
-            <label for="milk-volume">
+            <label for="milk-volume-ml">
                 Milk Volume
             </label>
 
@@ -48,7 +44,7 @@
 
                 <input
                     type="number"
-                    id="milk-volume"
+                    id="milk-volume-ml"
                     min="0.1"
                     step="0.1"
                     value="100"
@@ -65,7 +61,6 @@
 
         </div>
 
-
         <!-- ADULTERANTS -->
         <div class="form-group">
 
@@ -77,9 +72,7 @@
 
         </div>
 
-
         <div class="adulterant-list">
-
 
             <!-- WATER -->
             <div class="adulterant-row">
@@ -94,7 +87,6 @@
                     <span>Water</span>
 
                 </label>
-
 
                 <div
                     id="water-fields"
@@ -124,7 +116,6 @@
 
             </div>
 
-
             <!-- UREA -->
             <div class="adulterant-row">
 
@@ -138,7 +129,6 @@
                     <span>Urea</span>
 
                 </label>
-
 
                 <div
                     id="urea-fields"
@@ -168,7 +158,6 @@
 
             </div>
 
-
             <!-- STARCH -->
             <div class="adulterant-row">
 
@@ -182,7 +171,6 @@
                     <span>Starch</span>
 
                 </label>
-
 
                 <div
                     id="starch-fields"
@@ -212,7 +200,6 @@
 
             </div>
 
-
             <!-- DETERGENT -->
             <div class="adulterant-row">
 
@@ -227,7 +214,6 @@
 
                 </label>
 
-
                 <div
                     id="detergent-fields"
                     class="adulterant-fields"
@@ -238,18 +224,18 @@
                         type="number"
                         id="detergent-amount"
                         min="0"
-                        step="0.1"
+                        step="0.01"
                         placeholder="Amount"
                     >
 
                     <span class="fixed-unit">
-                        mL
+                        tsp
                     </span>
 
                     <input
                         type="hidden"
                         id="detergent-unit"
-                        value="mL"
+                        value="tsp"
                     >
 
                 </div>
@@ -257,7 +243,6 @@
             </div>
 
         </div>
-
 
         <div id="pure-milk-note" style="display:none;">
             Pure milk sample: no adulterant amount is required.
@@ -273,7 +258,6 @@
             <h2>Sensor Measurements</h2>
         </div>
 
-
         <!-- pH -->
         <div class="measurement-card">
 
@@ -287,7 +271,6 @@
 
             </div>
 
-
             <button
                 id="measure-ph"
                 onclick="measureSensor('ph')"
@@ -296,7 +279,6 @@
             </button>
 
         </div>
-
 
         <!-- TDS -->
         <div class="measurement-card">
@@ -315,7 +297,6 @@
 
             </div>
 
-
             <button
                 id="measure-tds"
                 onclick="measureSensor('tds')"
@@ -324,7 +305,6 @@
             </button>
 
         </div>
-
 
         <!-- TCS -->
         <div class="measurement-card">
@@ -340,7 +320,6 @@
                 </div>
 
             </div>
-
 
             <button
                 id="measure-tcs"
@@ -362,7 +341,6 @@
     <div class="card-header">
         <h2>TCS3448 Spectral Values</h2>
     </div>
-
 
     <div class="spectral-grid">
 
@@ -464,7 +442,6 @@
 
     <div class="measurement-modal-content">
 
-
         <!-- HEADER -->
         <div class="measurement-modal-header">
 
@@ -479,7 +456,6 @@
                 </p>
 
             </div>
-
 
             <button
                 id="measurement-close"
@@ -545,7 +521,6 @@
         <!-- STATS -->
         <div class="measurement-stats">
 
-
             <div class="measurement-stat">
 
                 <span>
@@ -557,7 +532,6 @@
                 </strong>
 
             </div>
-
 
             <div class="measurement-stat">
 
@@ -603,7 +577,6 @@
                 </small>
 
             </div>
-
 
             <p id="measurement-complete-message">
             </p>

@@ -1,27 +1,22 @@
 {% extends "base.html" %}
 
-
 {% block content %}
 
 <div class="page-header">
-
     <div>
-
-        <h1>
-            Calibration
-        </h1>
+        <h1>Calibration</h1>
 
         <p>
-            Prepare sensors before collecting the final dataset.
+            Calibrate the pH sensor before collecting the final dataset.
         </p>
-
     </div>
-
 </div>
 
 
 <div class="grid-2">
 
+
+    <!-- pH CALIBRATION -->
 
     <div class="card">
 
@@ -30,17 +25,288 @@
         </h3>
 
         <p>
-            Calibrate the pH sensor using appropriate
-            standard buffer solutions before experimental
-            measurements.
+            Use standard pH 4.00, pH 7.00 and pH 9.20
+            buffer solutions. The sensor reading is shown
+            live during calibration.
         </p>
 
         <div class="notice">
-            Calibration is performed on the ESP32.
+            Place the electrode in the selected buffer solution,
+            then start calibration. Wait until the live pH reading
+            becomes stable.
         </div>
+
+
+        <div class="calibration-section">
+
+
+            <!-- pH 4 -->
+
+            <div class="calibration-point">
+
+                <h4>
+                    pH 4.00 Buffer
+                </h4>
+
+                <p>
+                    Place the electrode in pH 4.00 buffer
+                    and start the live measurement.
+                </p>
+
+                <div class="calibration-live-box">
+
+                    <div class="calibration-target">
+                        Target pH
+                        <strong>4.00</strong>
+                    </div>
+
+                    <div class="calibration-live-reading">
+
+                        <span class="calibration-live-label">
+                            Live pH
+                        </span>
+
+                        <span
+                            id="ph4-live"
+                            class="calibration-live-value"
+                        >
+                            --
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+                <div
+                    id="ph4-status"
+                    class="notice"
+                >
+                    Ready
+                </div>
+
+
+                <button
+                    type="button"
+                    id="ph4-start"
+                    onclick="requestCalibrationVoltage('ph4')"
+                >
+                    Start pH 4.00 Calibration
+                </button>
+
+
+                <button
+                    type="button"
+                    id="ph4-stop"
+                    class="secondary-button"
+                    onclick="stopCalibration('ph4')"
+                    disabled
+                >
+                    Stop
+                </button>
+
+
+            </div>
+
+
+
+            <!-- pH 7 -->
+
+            <div class="calibration-point">
+
+                <h4>
+                    pH 7.00 Buffer
+                </h4>
+
+                <p>
+                    Place the electrode in pH 7.00 buffer
+                    and start the live measurement.
+                </p>
+
+                <div class="calibration-live-box">
+
+                    <div class="calibration-target">
+                        Target pH
+                        <strong>7.00</strong>
+                    </div>
+
+                    <div class="calibration-live-reading">
+
+                        <span class="calibration-live-label">
+                            Live pH
+                        </span>
+
+                        <span
+                            id="ph7-live"
+                            class="calibration-live-value"
+                        >
+                            --
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+                <div
+                    id="ph7-status"
+                    class="notice"
+                >
+                    Ready
+                </div>
+
+
+                <button
+                    type="button"
+                    id="ph7-start"
+                    onclick="requestCalibrationVoltage('ph7')"
+                >
+                    Start pH 7.00 Calibration
+                </button>
+
+
+                <button
+                    type="button"
+                    id="ph7-stop"
+                    class="secondary-button"
+                    onclick="stopCalibration('ph7')"
+                    disabled
+                >
+                    Stop
+                </button>
+
+
+            </div>
+
+
+
+            <!-- pH 9.20 -->
+
+            <div class="calibration-point">
+
+                <h4>
+                    pH 9.20 Buffer
+                </h4>
+
+                <p>
+                    Place the electrode in pH 9.20 buffer
+                    and start the live measurement.
+                </p>
+
+                <div class="calibration-live-box">
+
+                    <div class="calibration-target">
+                        Target pH
+                        <strong>9.20</strong>
+                    </div>
+
+                    <div class="calibration-live-reading">
+
+                        <span class="calibration-live-label">
+                            Live pH
+                        </span>
+
+                        <span
+                            id="ph920-live"
+                            class="calibration-live-value"
+                        >
+                            --
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+                <div
+                    id="ph920-status"
+                    class="notice"
+                >
+                    Ready
+                </div>
+
+
+                <button
+                    type="button"
+                    id="ph920-start"
+                    onclick="requestCalibrationVoltage('ph920')"
+                >
+                    Start pH 9.20 Calibration
+                </button>
+
+
+                <button
+                    type="button"
+                    id="ph920-stop"
+                    class="secondary-button"
+                    onclick="stopCalibration('ph920')"
+                    disabled
+                >
+                    Stop
+                </button>
+
+
+            </div>
+
+
+        </div>
+
+
+        <!-- CALIBRATION SUMMARY -->
+
+        <div class="notice">
+
+            <strong>
+                Calibration Progress
+            </strong>
+
+            <br><br>
+
+            <div>
+                pH 4.00:
+                <span id="current-ph4">
+                    Not captured
+                </span>
+            </div>
+
+            <div>
+                pH 7.00:
+                <span id="current-ph7">
+                    Not captured
+                </span>
+            </div>
+
+            <div>
+                pH 9.20:
+                <span id="current-ph920">
+                    Not captured
+                </span>
+            </div>
+
+        </div>
+
+
+        <button
+            id="save-ph-calibration"
+            class="primary-button"
+            onclick="savePHCalibration()"
+            disabled
+        >
+            Save pH Calibration
+        </button>
+
+
+        <div
+            id="calibration-message"
+            class="message"
+        ></div>
+
 
     </div>
 
+
+
+    <!-- TDS CALIBRATION -->
 
     <div class="card">
 
@@ -54,11 +320,20 @@
         </p>
 
         <div class="notice">
-            Record the calibration information.
+            Your current TDS setup uses conductivity-based
+            calculation at 25°C.
+        </div>
+
+        <div class="notice">
+            Record the reference solution and observed
+            TDS value during validation.
         </div>
 
     </div>
 
+
+
+    <!-- TCS3448 -->
 
     <div class="card">
 
@@ -79,5 +354,12 @@
 
 
 </div>
+
+{% endblock %}
+
+
+{% block scripts %}
+
+<script src="{{ url_for('static', filename='js/calibration.js') }}"></script>
 
 {% endblock %}
